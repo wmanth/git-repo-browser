@@ -1,6 +1,7 @@
 import express from "express";
-import Git, { Tag } from 'nodegit'
+import Git, { Tree } from 'nodegit'
 import { exit } from "process";
+import { FileEntry } from "./FileEntry.js"
 
 // tslint:disable:no-console
 
@@ -43,8 +44,8 @@ app.get( "/tags", ( req, res, next ) => {
 
 app.get( "/lookup", ( req, res, next ) => {
     repo.getReferenceCommit(`refs/tags/${req.query.tagName}`)
-    .then(commit => {
-        res.json({ "author": commit.author().name(), "email": commit.author().email() })
-    })
+    .then(commit => commit.getTree())
+    .then(tree => FileEntry.parseTree(tree))
+    .then(fileEntries => res.json(fileEntries))
     .catch(reason => { next(reason) })
 })
