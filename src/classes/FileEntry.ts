@@ -1,12 +1,12 @@
 import { Tree, TreeEntry } from 'nodegit'
 
 export class FileEntry {
-    name: string
     path: string
+    sha: string
 
     constructor(treeEntry: TreeEntry) {
-        this.name = treeEntry.name()
         this.path = treeEntry.path()
+        this.sha = treeEntry.sha()
     }
 
     static async parseTree(tree: Tree): Promise<FileEntry[]> {

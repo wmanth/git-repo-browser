@@ -16,7 +16,7 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
-            "env": {"REPO_PATH": "/Users/wolfram/Development/github/node-git-server/repo.git"}
+            "env": {"REPO_HOME": "/Users/wolfram/Development/github/node-git-server/data"}
         }
     ]
 }
