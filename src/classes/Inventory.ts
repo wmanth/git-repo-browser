@@ -17,6 +17,10 @@ export default class Inventory {
     private static instance: Inventory
 
     private constructor() {
+        // check if the REPO_HOME environment variable is set
+        if (Global.REPO_HOME === undefined) {
+            throw new Error("REPO_HOME environment variable not set.")
+        }
         // read the repository inventory file
         const inventoryPath = path.join(Global.REPO_HOME, 'repos.json')
         const data = fs.readFileSync(inventoryPath, 'utf8')
