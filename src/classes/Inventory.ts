@@ -37,4 +37,8 @@ export default class Inventory {
     getEntry(key: string): InventoryEntry {
         return this.entries[key]
     }
+
+    allEntries(): Dictionary<InventoryEntry> {
+        return this.entries
+    }
 }
