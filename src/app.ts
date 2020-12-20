@@ -1,9 +1,13 @@
-import express from "express";
+import express from "express"
+import morgan from "morgan"
 import * as Global from "./globals.js"
 import { repos } from "./routes/repos.js"
 
 // tslint:disable:no-console
 const app = express()
+
+// log HTTP requests
+app.use(morgan('tiny'))
 
 // define a route handler for the repository inspection
 app.use("/repos", repos)
