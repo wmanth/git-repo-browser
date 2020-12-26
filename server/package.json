@@ -1,8 +1,8 @@
 {
-  "name": "node-git-server",
+  "name": "git-repo-browser",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/app.js",
+  "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
