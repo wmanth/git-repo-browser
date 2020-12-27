@@ -1,7 +1,7 @@
 import path from "path";
 import express from "express";
 import Git from "nodegit"
-import { FileEntry } from "../classes/FileEntry.js"
+import FileTreeBuilder from "../classes/FileTreeBuilder.js"
 import * as Global from "../globals.js"
 
 export const repos = express.Router()
@@ -24,12 +24,12 @@ repos.get("/:id/tags", ( req, res, next ) =>
 )
 
 // list all files in the repository for the given tag name
-repos.get( "/:id/lookup", ( req, res, next ) =>
+repos.get( "/:id/filetree", ( req, res, next ) =>
     Git.Repository.openBare(repoPath(req.params.id))
-    .then(repo => repo.getReferenceCommit(`refs/tags/${req.query.tagName}`))
+    .then(repo => repo.getReferenceCommit(`refs/tags/${req.query.tag}`))
     .then(commit => commit.getTree())
-    .then(tree => FileEntry.parseTree(tree))
-    .then(fileEntries => res.json(fileEntries))
+    .then(tree => FileTreeBuilder.build(tree))
+    .then(fileTree => res.json(fileTree))
     .catch(reason => next(reason))
 )
 

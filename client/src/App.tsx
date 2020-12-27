@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Layout, { Content, Header } from "antd/lib/layout/layout"
 import Sider from "antd/lib/layout/Sider"
 import TagSelect from "./components/TagSelect"
+import FileBrowser from "./components/FileBrowser"
 import * as RepoFetcher from './classes/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
@@ -21,6 +22,10 @@ export default class App extends Component {
 
 	handleTagChanged() {
 		console.log("Tag changed");
+	}
+
+	handleFileSelected(selectedKeys: any, info: any) {
+		console.log('selected', selectedKeys, info);
 	}
 
 	componentDidMount() {
@@ -52,7 +57,13 @@ export default class App extends Component {
 					/>
 				</Header>
 				<Layout>
-					<Sider>Sider</Sider>
+					<Sider>
+						<FileBrowser
+							onSelect = { this.handleFileSelected }
+							repo = { this.state.repo }
+							tag = { this.state.currentTag }
+						/>
+					</Sider>
 					<Content>Content</Content>
 				</Layout>
 			</Layout>

@@ -4,9 +4,15 @@
   margin: 16px 24px 16px 0;
 }
 
+.ant-layout-header {
+  border-bottom: 1px solid lightgrey;
+}
+
+
 .code-box-demo {
   text-align: center;
 }
+
 .ant-layout-header,
 .ant-layout-footer {
   color: black;
