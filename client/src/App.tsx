@@ -1,32 +1,61 @@
 import React, { Component } from 'react'
+import Layout, { Content, Header } from "antd/lib/layout/layout"
+import Sider from "antd/lib/layout/Sider"
+import TagSelect from "./components/TagSelect"
+import * as RepoFetcher from './classes/RepoFetcher'
+import "antd/dist/antd.css"
+import "./App.css"
 
 interface AppState {
-  repos: string[]
+	repo: string
+	tags: string[]
+	currentTag: string
 }
 
 export default class App extends Component {
-  state: AppState = {
-    repos: []
-  }
+	state: AppState = {
+		repo: "",
+		tags: [],
+		currentTag: ""
+	}
 
-  componentDidMount() {
-    fetch('/repos/list')
-    .then(response => response.json())
-    .then(repos => {
-      const repoIds = Object.keys(repos)
-      this.setState({repos: repoIds})
-    })
-    .catch(err => console.error(err))
-  }
- 
-  render() {
-    return (
-      <div className="App">
-        <h1>Repository IDs</h1>
-        <ul>
-          { this.state.repos.map(repo => <ul key={repo}>{repo}</ul>) }
-        </ul>
-      </div>
-    )
-  }
+	handleTagChanged() {
+		console.log("Tag changed");
+	}
+
+	componentDidMount() {
+		const lastRepo = localStorage.getItem('lastRepo') || ""
+		RepoFetcher.fetchRepoIds()
+		.then(repos => this.updateRepo(repos.includes(lastRepo) ? lastRepo : repos[0]))
+		.catch(err => console.error(err));
+	}
+
+	updateRepo(repo: string) {
+		RepoFetcher.fetchTags(repo)
+		.then(tags => this.updateTags(tags))
+		.catch(err => console.error(err));
+		this.setState({ repo: repo })
+	}
+
+	updateTags(tags: string[]) {
+		this.setState({ tags: tags, currentTag: tags[0] })
+	}
+
+	render() {
+		return (
+			<Layout style={{ position: "fixed", width: "100%", height: "100%" }}>
+				<Header>
+					<span className="title">{ RepoFetcher.getRepoName(this.state.repo) }</span>
+					<TagSelect
+						onTagChanged={ this.handleTagChanged }
+						tags={ this.state.tags }
+					/>
+				</Header>
+				<Layout>
+					<Sider>Sider</Sider>
+					<Content>Content</Content>
+				</Layout>
+			</Layout>
+		)
+	}
 }
