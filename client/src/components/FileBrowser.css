@@ -1,4 +1,5 @@
 .filebrowser {
     height: 100%;
     overflow: auto;
+    border-right: 1px solid lightgray;
 }

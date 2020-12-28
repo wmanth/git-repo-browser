@@ -3,7 +3,8 @@ import Layout, { Content, Header } from "antd/lib/layout/layout"
 import Sider from "antd/lib/layout/Sider"
 import TagSelect from "./components/TagSelect"
 import FileBrowser from "./components/FileBrowser"
-import * as RepoFetcher from './classes/RepoFetcher'
+import CodeViewer from "./components/CodeViewer"
+import * as RepoFetcher from './utils/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
 
@@ -11,13 +12,15 @@ interface AppState {
 	repo: string
 	tags: string[]
 	currentTag: string
+	content?: string
 }
 
 export default class App extends Component {
 	state: AppState = {
 		repo: "",
 		tags: [],
-		currentTag: ""
+		currentTag: "",
+		content: "Hello Yulie!"
 	}
 
 	handleTagChanged() {
@@ -64,7 +67,9 @@ export default class App extends Component {
 							tag = { this.state.currentTag }
 						/>
 					</Sider>
-					<Content>Content</Content>
+					<Content>
+						<CodeViewer content = { this.state.content } />
+					</Content>
 				</Layout>
 			</Layout>
 		)

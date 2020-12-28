@@ -3,7 +3,7 @@ import { Tree } from 'antd'
 import { DataNode } from 'antd/lib/tree'
 import { DownOutlined } from '@ant-design/icons'
 import FileTreeNode from '../common/FileTreeNode'
-import { fetchFileTree } from '../classes/RepoFetcher'
+import { fetchFileTree } from '../utils/RepoFetcher'
 import "./FileBrowser.css"
 
 interface FileBrowserProps {
@@ -31,6 +31,7 @@ export default class FileBrowser extends Component<FileBrowserProps, FileBrowser
 			const dataNode: DataNode = {
 				title: node.name,
 				key: node.sha,
+				isLeaf: !node.childs,
 				children: node.childs && node.childs.map(fromFileTreeNodeToDataNode)
 			}
 			return dataNode
