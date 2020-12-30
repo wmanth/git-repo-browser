@@ -1,32 +1,38 @@
-import FileTreeNode from '../common/FileTreeNode'
-import { Tree, TreeEntry } from 'nodegit'
+import { FileTree, FileTreeNode } from '../common/Types.js'
+import { Tree as GitTree, TreeEntry as GitTreeEntry } from 'nodegit'
 
 export default class FileTreeBuilder {
 
-    private static createFileTreeNode = (treeEntry: TreeEntry) => {
-        const node: FileTreeNode = {
-            name: treeEntry.name(),
-            path: treeEntry.path(),
-            sha: treeEntry.sha()
-        }
-        return node
-    }
+	private static createFileTreeNode = (treeEntry: GitTreeEntry) => {
+		const node: FileTreeNode = {
+			object: {
+				name: treeEntry.name(),
+				sha: treeEntry.sha()
+			}
+		}
+		return node
+	}
 
-    static async build(tree: Tree): Promise<FileTreeNode[]> {
-        const fileTree = new Array<FileTreeNode>()
-        const promises = new Array<Promise<FileTreeNode[]>>()
+	private static async collectFileTreeNodes(tree: GitTree): Promise<FileTreeNode[]> {
+		const fileTreeNodes: FileTreeNode[] = []
+		const promises: Promise<FileTreeNode[]>[] = []
 
-        tree.entries().forEach(treeEntry => {
-            const fileTreeNode = this.createFileTreeNode(treeEntry)
-            fileTree.push(fileTreeNode)
-            if (treeEntry.isDirectory()) {
-                promises.push(treeEntry.getTree()
-                .then(childTree => FileTreeBuilder.build(childTree))
-                .then(childs => fileTreeNode.childs = childs))
-            }
-        })
+		tree.entries().forEach(treeEntry => {
+			const fileTreeNode = this.createFileTreeNode(treeEntry)
+			fileTreeNodes.push(fileTreeNode)
+			if (treeEntry.isDirectory()) {
+				promises.push(treeEntry.getTree()
+				.then(childTree => FileTreeBuilder.collectFileTreeNodes(childTree))
+				.then(childs => fileTreeNode.childs = childs))
+			}
+		})
 
-        await Promise.all(promises)
-        return fileTree
-    }
+		await Promise.all(promises)
+		return fileTreeNodes
+	}
+
+	static async build(tree: GitTree): Promise<FileTree> {
+		const fileTreeNodes = await FileTreeBuilder.collectFileTreeNodes(tree)
+		return new FileTree(fileTreeNodes)
+	}
 }

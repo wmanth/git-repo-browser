@@ -3,8 +3,9 @@ import Layout, { Content, Header } from "antd/lib/layout/layout"
 import Sider from "antd/lib/layout/Sider"
 import TagSelect from "./components/TagSelect"
 import FileBrowser from "./components/FileBrowser"
-import FileTreeNode from './common/FileTreeNode'
 import Workspace from './components/Workspace'
+import IndexPath from './common/IndexPath'
+import { FileTree } from './common/Types'
 import * as RepoFetcher from './utils/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
@@ -13,8 +14,8 @@ interface AppState {
 	repo: string
 	tags: string[]
 	currentTag: string
-	fileTree?: FileTreeNode[]
-	selected?: string
+	fileTree: FileTree
+	selected: IndexPath
 }
 
 export default class App extends Component {
@@ -22,6 +23,8 @@ export default class App extends Component {
 		repo: "",
 		tags: [],
 		currentTag: "",
+		fileTree: FileTree.empty,
+		selected: IndexPath.empty
 	}
 
 	handleTagChanged(tag: string) {
@@ -29,7 +32,7 @@ export default class App extends Component {
 	}
 
 	handleFileSelected(selectedKeys: string[]) {
-		this.setState({ selected: selectedKeys[0] })
+		this.setState({ selected: IndexPath.fromString(selectedKeys[0]) })
 	}
 
 	componentDidMount() {
@@ -58,7 +61,7 @@ export default class App extends Component {
 		.catch(err => console.error(err));
 	}
 
-	updateFileTree(fileTree: FileTreeNode[]) {
+	updateFileTree(fileTree: FileTree) {
 		this.setState({ fileTree: fileTree })
 	}
 

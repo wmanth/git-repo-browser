@@ -1,4 +1,4 @@
-import FileTreeNode from '../common/FileTreeNode'
+import { FileTree } from '../common/Types'
 
 interface Dictionary<T> {
     [key: string]: T;
@@ -32,8 +32,8 @@ export function getRepoName(id: string) {
 
 export async function fetchFileTree(repo: string, tag: string) {
 	const response = await fetch(`/repos/${repo}/filetree?tag=${tag}`)
-	const fileTree = await response.json()
-	return fileTree as FileTreeNode[]
+	const fileTreeNodes = await response.json()
+	return new FileTree(fileTreeNodes)
 }
 
 export async function fetchContent(repo: string, sha: string) {

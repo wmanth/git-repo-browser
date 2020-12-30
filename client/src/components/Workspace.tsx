@@ -1,64 +1,47 @@
 import React, { Component } from 'react'
-import Layout, { Content, Header } from 'antd/lib/layout/layout'
-import FileTreeNode from '../common/FileTreeNode'
+import FileNavigator from './FileNavigator'
 import CodeViewer from './CodeViewer'
-import { Dictionary } from '../common/Types'
+import IndexPath from '../common/IndexPath'
+import { FileTree } from '../common/Types'
 import { fetchContent } from '../utils/RepoFetcher'
-import './Workspace.css'
-
-interface BlobInfo {
-	path: string
-}
 
 interface WorkspaceProps {
-	repo?: string
-	fileTree?: FileTreeNode[]
-	selected?: string
+	repo: string
+	fileTree: FileTree
+	selected: IndexPath
 }
 
 interface WorkspaceState {
 	content?: string
-	blobDict?: Dictionary<BlobInfo>
 }
 
 export default class Workspace extends Component<WorkspaceProps, WorkspaceState> {
 	state = { content: "Hello Yulie!" }
 
 	componentDidUpdate(prevProps: WorkspaceProps) {
-		if (prevProps.fileTree !== this.props.fileTree) {
-			this.updateBlobDict()
-		}
-		else if (prevProps.selected !== this.props.selected) {
+		if (prevProps.selected !== this.props.selected) {
 			this.updateSelected()
 		}
 	}
 
 	updateSelected() {
-		if (this.props.repo && this.props.selected) {
-			fetchContent(this.props.repo, this.props.selected)
+		const blob = this.props.fileTree.objectAtIndexPath(this.props.selected)
+		if (blob) {
+			fetchContent(this.props.repo, blob.sha)
 			.then(content => this.setState({ content: content}))
 			.catch(err => console.error(err));
 		}
 	}
 
-	updateBlobDict() {
-		var blobDict: Dictionary<BlobInfo> = {};
-		const addBlob = (node: FileTreeNode) => {
-			blobDict[node.sha] = { path: node.path }
-			node.childs?.forEach(addBlob)
-		}
-		this.props.fileTree?.forEach(addBlob)
-		this.setState({ blobDict: blobDict })
-	}
-
 	render() {
 		return (
-			<Layout style={{ position: "fixed", width: "100%", height: "100%" }}>
-				<Header className="breadcrumb" />
-				<Content style={{ width: "100%", height: "100%" }}>
+			<React.Fragment>
+					<FileNavigator
+						fileTree={ this.props.fileTree }
+						selected={ this.props.selected }
+					/>
 					<CodeViewer content={ this.state.content } />
-				</Content>
-			</Layout>
+			</React.Fragment>
 		)
 	}
 }

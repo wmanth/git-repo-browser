@@ -29,7 +29,7 @@ repos.get( "/:id/filetree", ( req, res, next ) =>
     .then(repo => repo.getReferenceCommit(`refs/tags/${req.query.tag}`))
     .then(commit => commit.getTree())
     .then(tree => FileTreeBuilder.build(tree))
-    .then(fileTree => res.json(fileTree))
+    .then(fileTree => res.json(fileTree.childs))
     .catch(reason => next(reason))
 )
 
