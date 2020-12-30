@@ -3,7 +3,8 @@ import Layout, { Content, Header } from "antd/lib/layout/layout"
 import Sider from "antd/lib/layout/Sider"
 import TagSelect from "./components/TagSelect"
 import FileBrowser from "./components/FileBrowser"
-import CodeViewer from "./components/CodeViewer"
+import FileTreeNode from './common/FileTreeNode'
+import Workspace from './components/Workspace'
 import * as RepoFetcher from './utils/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
@@ -12,7 +13,8 @@ interface AppState {
 	repo: string
 	tags: string[]
 	currentTag: string
-	content?: string
+	fileTree?: FileTreeNode[]
+	selected?: string
 }
 
 export default class App extends Component {
@@ -20,15 +22,14 @@ export default class App extends Component {
 		repo: "",
 		tags: [],
 		currentTag: "",
-		content: "Hello Yulie!"
 	}
 
-	handleTagChanged() {
-		console.log("Tag changed");
+	handleTagChanged(tag: string) {
+		this.updateCurrentTag(tag);
 	}
 
-	handleFileSelected(selectedKeys: any, info: any) {
-		console.log('selected', selectedKeys, info);
+	handleFileSelected(selectedKeys: string[]) {
+		this.setState({ selected: selectedKeys[0] })
 	}
 
 	componentDidMount() {
@@ -39,36 +40,51 @@ export default class App extends Component {
 	}
 
 	updateRepo(repo: string) {
+		this.setState({ repo: repo })
 		RepoFetcher.fetchTags(repo)
 		.then(tags => this.updateTags(tags))
 		.catch(err => console.error(err));
-		this.setState({ repo: repo })
 	}
 
 	updateTags(tags: string[]) {
-		this.setState({ tags: tags, currentTag: tags[0] })
+		this.setState({ tags: tags })
+		this.updateCurrentTag(tags[0])
+	}
+
+	updateCurrentTag(tag: string) {
+		this.setState({ currentTag: tag })
+		RepoFetcher.fetchFileTree(this.state.repo, tag)
+		.then(fileTree => this.updateFileTree(fileTree))
+		.catch(err => console.error(err));
+	}
+
+	updateFileTree(fileTree: FileTreeNode[]) {
+		this.setState({ fileTree: fileTree })
 	}
 
 	render() {
 		return (
 			<Layout style={{ position: "fixed", width: "100%", height: "100%" }}>
-				<Header>
+				<Header className="titleBar">
 					<span className="title">{ RepoFetcher.getRepoName(this.state.repo) }</span>
 					<TagSelect
-						onTagChanged={ this.handleTagChanged }
+						onTagChanged={ this.handleTagChanged.bind(this) }
 						tags={ this.state.tags }
 					/>
 				</Header>
 				<Layout>
 					<Sider>
 						<FileBrowser
-							onSelect = { this.handleFileSelected }
-							repo = { this.state.repo }
-							tag = { this.state.currentTag }
+							onSelect={ this.handleFileSelected.bind(this) }
+							fileTree={ this.state.fileTree }
 						/>
 					</Sider>
 					<Content>
-						<CodeViewer content = { this.state.content } />
+						<Workspace
+							fileTree={ this.state.fileTree }
+							repo={ this.state.repo }
+							selected={ this.state.selected }
+						/>
 					</Content>
 				</Layout>
 			</Layout>

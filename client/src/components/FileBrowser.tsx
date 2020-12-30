@@ -3,13 +3,11 @@ import { Tree } from 'antd'
 import { DataNode } from 'antd/lib/tree'
 import { DownOutlined } from '@ant-design/icons'
 import FileTreeNode from '../common/FileTreeNode'
-import { fetchFileTree } from '../utils/RepoFetcher'
 import "./FileBrowser.css"
 
 interface FileBrowserProps {
 	onSelect: (selectedKeys: any, info: any) => void
-	repo: string
-	tag: string
+	fileTree?: FileTreeNode[]
 }
 
 interface FileBrowserState {
@@ -18,9 +16,9 @@ interface FileBrowserState {
 
 export default class FileBrowser extends Component<FileBrowserProps, FileBrowserState> {
 	state = { treeData: undefined }
-	
+
 	componentDidUpdate(prevProps: FileBrowserProps) {
-		if (this.props.repo !== prevProps.repo || this.props.tag !== prevProps.tag) {
+		if (prevProps.fileTree !== this.props.fileTree) {
 			this.updateTreeData()
 		}
 	}
@@ -31,20 +29,12 @@ export default class FileBrowser extends Component<FileBrowserProps, FileBrowser
 			const dataNode: DataNode = {
 				title: node.name,
 				key: node.sha,
-				isLeaf: !node.childs,
-				children: node.childs && node.childs.map(fromFileTreeNodeToDataNode)
+				children: node.childs?.map(fromFileTreeNodeToDataNode)
 			}
 			return dataNode
 		}
 
-		if (!this.props.repo || !this.props.tag) {
-			this.setState({ treeData: undefined })
-		}
-		else {
-			fetchFileTree(this.props.repo, this.props.tag)
-			.then(fileTree => this.setState({ treeData: fileTree.map(fromFileTreeNodeToDataNode) }))
-			.catch(reason => console.error(reason))
-		}
+		this.setState({ treeData: this.props.fileTree?.map(fromFileTreeNodeToDataNode) })
 	}
 
 	render() {

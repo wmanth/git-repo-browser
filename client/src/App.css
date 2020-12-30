@@ -1,11 +1,11 @@
+.titleBar {
+  border-bottom: 1px solid lightgrey;
+}
+
 .title {
   font-size: x-large;
   font-weight: bold;
   margin: 16px 24px 16px 0;
-}
-
-.ant-layout-header {
-  border-bottom: 1px solid lightgrey;
 }
 
 
