@@ -24,7 +24,7 @@ export class Tree<T> {
 	objectAtIndexPath(indexPath: IndexPath): T | undefined {
 		let treeNode: TreeNode<T> | undefined
 		let childs: TreeNode<T>[] | undefined = this.childs
-		for (const index of indexPath.indexes) {
+		for (const index of indexPath.getIndexes()) {
 			treeNode = childs && childs[index]
 			childs = treeNode?.childs
 		}

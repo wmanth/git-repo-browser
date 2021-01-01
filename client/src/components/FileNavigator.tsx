@@ -10,12 +10,27 @@ interface FileNavigatorProps {
 }
 
 export default class FileNavigator extends Component<FileNavigatorProps> {
+
+	renderTrail() {
+		let index: number | undefined
+		const indexes = this.props.selected.getIndexes()
+		const trailIndexes: number[] = []
+		const breadcrumbs: JSX.Element[] = []
+
+		while (undefined !== (index = indexes.shift())) {
+			trailIndexes.push(index)
+			const trailIndexPath = new IndexPath(trailIndexes)
+			const blob = this.props.fileTree.objectAtIndexPath(trailIndexPath)
+			breadcrumbs.push(<Breadcrumb.Item key={ trailIndexPath.toString() }>{ blob?.name }</Breadcrumb.Item>)
+		}
+		return breadcrumbs
+	}
+
 	render() {
 		return (
 			// use &rsaquo; or &#9002; as separator
 			<Breadcrumb className="filenavigator" separator="&rsaquo;">
-				<Breadcrumb.Item>First</Breadcrumb.Item>
-				<Breadcrumb.Item>Second</Breadcrumb.Item>
+				{ this.renderTrail() }
 			</Breadcrumb>
 		)
 	}
