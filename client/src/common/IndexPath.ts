@@ -4,15 +4,21 @@ export default class IndexPath {
 	static empty: IndexPath = new IndexPath([])
 
 	constructor(indexes: number[]) {
-		this.indexes = indexes
+		this.indexes = indexes.map(value => value)
 	}
 
 	static fromString(str: string): IndexPath {
 		return new IndexPath(str.split('-').map(index => parseInt(index)))
 	}
 
+	indexPathAppendingIndex(index: number) {
+		const indexes = this.indexes.map(value => value);
+		indexes.push(index)
+		return new IndexPath(indexes)
+	}
+
 	getIndexes(): number[] {
-		return Object.assign([], this.indexes);
+		return this.indexes.map(value => value);
 	}
 
 	toString(): string {

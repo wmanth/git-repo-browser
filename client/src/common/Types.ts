@@ -30,6 +30,18 @@ export class Tree<T> {
 		}
 		return treeNode?.object
 	}
+
+	childsAtIndexPath(indexPath: IndexPath): TreeNode<T>[] | undefined {
+		if (indexPath.getIndexes().length === 0) { return this.childs }
+
+		let treeNode: TreeNode<T> | undefined
+		let childs: TreeNode<T>[] | undefined = this.childs
+		for (const index of indexPath.getIndexes()) {
+			treeNode = childs && childs[index]
+			childs = treeNode?.childs
+		}
+		return treeNode?.childs
+	}
 }
 
 export interface GitBlob {
