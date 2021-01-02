@@ -4,18 +4,24 @@ import './FileNavigator.css'
 import { FileTree } from '../common/Types';
 import IndexPath from '../common/IndexPath';
 import SubMenu from 'antd/lib/menu/SubMenu';
+import { selectionHandler } from '../App';
 
 interface FileNavigatorProps {
 	fileTree: FileTree
 	selected: IndexPath
+	onSelect: selectionHandler
 }
 
 export default class FileNavigator extends Component<FileNavigatorProps> {
 
+	handleClick(menuInfo: any) {
+		this.props.onSelect(menuInfo.key)
+	}
+
 	renderMenu(indexPath: IndexPath) {
 		const menuNodes = this.props.fileTree.childsAtIndexPath(indexPath)
 		return (
-			<Menu>
+			<Menu onClick={ this.handleClick.bind(this) }>
 				{ menuNodes?.map((node, index) => this.renderMenuItem(indexPath.indexPathAppendingIndex(index))) }
 			</Menu>
 		)

@@ -4,9 +4,10 @@ import { DataNode } from 'antd/lib/tree'
 import { DownOutlined } from '@ant-design/icons'
 import { FileTree, FileTreeNode } from '../common/Types'
 import "./FileBrowser.css"
+import { selectionHandler } from '../App'
 
 interface FileBrowserProps {
-	onSelect: (selectedKeys: any, info: any) => void
+	onSelect: selectionHandler
 	fileTree?: FileTree
 }
 
@@ -16,6 +17,10 @@ interface FileBrowserState {
 
 export default class FileBrowser extends Component<FileBrowserProps, FileBrowserState> {
 	state = { treeData: undefined }
+
+	handleSelected(selectedKeys: any) {
+		this.props.onSelect(selectedKeys[0])
+	}
 
 	componentDidUpdate(prevProps: FileBrowserProps) {
 		if (prevProps.fileTree !== this.props.fileTree) {
@@ -46,7 +51,7 @@ export default class FileBrowser extends Component<FileBrowserProps, FileBrowser
 			<Tree className="filebrowser"
 				showLine
 				switcherIcon = { <DownOutlined /> }
-				onSelect = { this.props.onSelect }
+				onSelect = { this.handleSelected.bind(this) }
 				treeData = { this.state.treeData }
 			/>
 		)

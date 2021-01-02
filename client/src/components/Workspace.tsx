@@ -4,11 +4,13 @@ import CodeViewer from './CodeViewer'
 import IndexPath from '../common/IndexPath'
 import { FileTree } from '../common/Types'
 import { fetchContent } from '../utils/RepoFetcher'
+import { selectionHandler } from '../App'
 
 interface WorkspaceProps {
 	repo: string
 	fileTree: FileTree
 	selected: IndexPath
+	onSelect: selectionHandler
 }
 
 interface WorkspaceState {
@@ -39,6 +41,7 @@ export default class Workspace extends Component<WorkspaceProps, WorkspaceState>
 					<FileNavigator
 						fileTree={ this.props.fileTree }
 						selected={ this.props.selected }
+						onSelect={ this.props.onSelect }
 					/>
 					<CodeViewer content={ this.state.content } />
 			</React.Fragment>

@@ -18,6 +18,8 @@ interface AppState {
 	selected: IndexPath
 }
 
+export type selectionHandler = (selectedKey: string) => void
+
 export default class App extends Component {
 	state: AppState = {
 		repo: "",
@@ -31,8 +33,8 @@ export default class App extends Component {
 		this.updateCurrentTag(tag);
 	}
 
-	handleFileSelected(selectedKeys: string[]) {
-		this.setState({ selected: IndexPath.fromString(selectedKeys[0]) })
+	handleSelected(selectedKey: string) {
+		this.setState({ selected: IndexPath.fromString(selectedKey) })
 	}
 
 	componentDidMount() {
@@ -78,7 +80,7 @@ export default class App extends Component {
 				<Layout>
 					<Sider>
 						<FileBrowser
-							onSelect={ this.handleFileSelected.bind(this) }
+							onSelect={ this.handleSelected.bind(this) }
 							fileTree={ this.state.fileTree }
 						/>
 					</Sider>
@@ -87,6 +89,7 @@ export default class App extends Component {
 							fileTree={ this.state.fileTree }
 							repo={ this.state.repo }
 							selected={ this.state.selected }
+							onSelect={ this.handleSelected.bind(this) }
 						/>
 					</Content>
 				</Layout>
