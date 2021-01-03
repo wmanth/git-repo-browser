@@ -8,7 +8,7 @@ export default class IndexPath {
 	}
 
 	static fromString(str: string): IndexPath {
-		return new IndexPath(str.split('-').map(index => parseInt(index)))
+		return new IndexPath(str.split('-').map(index => parseInt(index, 10)))
 	}
 
 	indexPathAppendingIndex(index: number) {

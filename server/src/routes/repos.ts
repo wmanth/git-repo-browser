@@ -33,10 +33,10 @@ repos.get( "/:id/filetree", ( req, res, next ) =>
     .catch(reason => next(reason))
 )
 
-// list all files in the repository for the given tag name
-repos.get( "/:id/content", ( req, res, next ) =>
+// provide the content of the blob determined by given sha
+repos.get( "/:id/blobs/:sha/content", ( req, res, next ) =>
     Git.Repository.openBare(repoPath(req.params.id))
-    .then(repo => repo.getBlob(req.query.sha as string))
+    .then(repo => repo.getBlob(req.params.sha as string))
     .then(blob => res.send(blob.content()))
     .catch(reason => next(reason))
 )

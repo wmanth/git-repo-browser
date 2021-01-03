@@ -37,7 +37,7 @@ export async function fetchFileTree(repo: string, tag: string) {
 }
 
 export async function fetchContent(repo: string, sha: string) {
-	const response = await fetch (`/repos/${repo}/content?sha=${sha}`)
+	const response = await fetch (`/repos/${repo}/blobs/${sha}/content`)
 	const content = await response.text()
 	return content
 }
