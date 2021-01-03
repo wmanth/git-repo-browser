@@ -5,6 +5,7 @@ import IndexPath from '../common/IndexPath'
 import { FileTree } from '../common/Types'
 import { fetchContent } from '../utils/RepoFetcher'
 import { selectionHandler } from '../App'
+import { Empty } from 'antd'
 
 interface WorkspaceProps {
 	repo: string
@@ -18,7 +19,7 @@ interface WorkspaceState {
 }
 
 export default class Workspace extends Component<WorkspaceProps, WorkspaceState> {
-	state = { content: "Hello Yulie!" }
+	state: WorkspaceState = {}
 
 	componentDidUpdate(prevProps: WorkspaceProps) {
 		if (prevProps.selected !== this.props.selected) {
@@ -37,7 +38,9 @@ export default class Workspace extends Component<WorkspaceProps, WorkspaceState>
 
 	render() {
 		return (
-			<React.Fragment>
+			this.props.selected.isEmpty()
+			? <Empty style={{ position: 'absolute', top: '50%', left: '50%', transform: 'scale(1.5)' }} image={ Empty.PRESENTED_IMAGE_SIMPLE } />
+			: <React.Fragment>
 					<FileNavigator
 						fileTree={ this.props.fileTree }
 						selected={ this.props.selected }

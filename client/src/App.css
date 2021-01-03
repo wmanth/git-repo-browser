@@ -43,7 +43,7 @@
 .ant-layout-content {
   min-height: 120px;
   color: #fff;
-  background: rgba(16, 142, 233, 1);
+  background: whitesmoke;
 }
 
 [data-theme="dark"] .ant-layout-content {

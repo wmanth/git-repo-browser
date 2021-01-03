@@ -57,7 +57,12 @@ export default class App extends Component {
 	}
 
 	updateCurrentTag(tag: string) {
-		this.setState({ currentTag: tag })
+		if (tag === this.state.currentTag) return
+		this.setState({
+			currentTag: tag,
+			fileTree: FileTree.empty,
+			selected: IndexPath.empty
+		})
 		RepoFetcher.fetchFileTree(this.state.repo, tag)
 		.then(fileTree => this.updateFileTree(fileTree))
 		.catch(err => console.error(err));

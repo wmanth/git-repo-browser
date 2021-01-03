@@ -24,4 +24,8 @@ export default class IndexPath {
 	toString(): string {
 		return this.indexes.join('-')
 	}
+
+	isEmpty(): boolean {
+		return this.indexes.length === 0
+	}
 }
