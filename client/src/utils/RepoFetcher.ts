@@ -1,5 +1,3 @@
-import { FileTree } from '../common/Types'
-
 interface Dictionary<T> {
     [key: string]: T;
 }
@@ -13,13 +11,13 @@ interface InventoryEntry {
 var repos: Dictionary<InventoryEntry>
 
 export const fetchRepoIds = async () => {
-	const response = await fetch('/repos/list')
+	const response = await fetch('/api/repos')
 	repos = await response.json()
 	return Object.keys(repos)
 }
 
 export const fetchTags = async (repo: string) => {
-	const response = await fetch(`/repos/${repo}/tags`)
+	const response = await fetch(`/api/repos/${repo}/refs/tags`)
 	const tags = await response.json()
 	return tags as string[]
 }
@@ -28,16 +26,4 @@ export function getRepoName(id: string) {
 	if (repos === undefined) return ""
 	if (repos[id] === undefined) return ""
 	return repos[id].name
-}
-
-export async function fetchFileTree(repo: string, tag: string) {
-	const response = await fetch(`/repos/${repo}/filetree?tag=${tag}`)
-	const fileTreeNodes = await response.json()
-	return new FileTree(fileTreeNodes)
-}
-
-export async function fetchContent(repo: string, sha: string) {
-	const response = await fetch (`/repos/${repo}/blobs/${sha}/content`)
-	const content = await response.text()
-	return content
 }

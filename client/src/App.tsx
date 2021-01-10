@@ -4,8 +4,7 @@ import Sider from "antd/lib/layout/Sider"
 import TagSelect from "./components/TagSelect"
 import FileBrowser from "./components/FileBrowser"
 import Workspace from './components/Workspace'
-import IndexPath from './common/IndexPath'
-import { FileTree } from './common/Types'
+import { GitTree } from './common/GitTree'
 import * as RepoFetcher from './utils/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
@@ -14,27 +13,32 @@ interface AppState {
 	repo: string
 	tags: string[]
 	currentTag: string
-	fileTree: FileTree
-	selected: IndexPath
+	gitTree?: GitTree
+	selected?: string
 }
 
-export type selectionHandler = (selectedKey: string) => void
+export type SelectionHandler = (selectedKey: string) => void
+export type UpdateTreeHandler = (path: string) => Promise<void>
 
 export default class App extends Component {
 	state: AppState = {
 		repo: "",
 		tags: [],
 		currentTag: "",
-		fileTree: FileTree.empty,
-		selected: IndexPath.empty
 	}
 
 	handleTagChanged(tag: string) {
 		this.updateCurrentTag(tag);
 	}
 
-	handleSelected(selectedKey: string) {
-		this.setState({ selected: IndexPath.fromString(selectedKey) })
+	async handleSelected(path: string) {
+		const node = await this.state.gitTree?.treeNodeAtPath(path)
+		if (node?.isFile()) this.setState({ selected: node.getPath() })
+	}
+
+	handleUpdateTree(path: string): Promise<void> {
+		console.log("want to update ", path)
+		return new Promise(resolve => resolve() )
 	}
 
 	componentDidMount() {
@@ -60,16 +64,9 @@ export default class App extends Component {
 		if (tag === this.state.currentTag) return
 		this.setState({
 			currentTag: tag,
-			fileTree: FileTree.empty,
-			selected: IndexPath.empty
+			gitTree: new GitTree(this.state.repo, `tags/${tag}`),
+			selected: undefined
 		})
-		RepoFetcher.fetchFileTree(this.state.repo, tag)
-		.then(fileTree => this.updateFileTree(fileTree))
-		.catch(err => console.error(err));
-	}
-
-	updateFileTree(fileTree: FileTree) {
-		this.setState({ fileTree: fileTree })
 	}
 
 	render() {
@@ -86,13 +83,13 @@ export default class App extends Component {
 					<Sider>
 						<FileBrowser
 							onSelect={ this.handleSelected.bind(this) }
-							fileTree={ this.state.fileTree }
+							gitTree={ this.state.gitTree }
+							onUpdateTree={ this.handleUpdateTree }
 						/>
 					</Sider>
 					<Content>
 						<Workspace
-							fileTree={ this.state.fileTree }
-							repo={ this.state.repo }
+							gitTree={ this.state.gitTree }
 							selected={ this.state.selected }
 							onSelect={ this.handleSelected.bind(this) }
 						/>

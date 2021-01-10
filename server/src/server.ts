@@ -14,7 +14,7 @@ server.use(express.static(path.resolve('dist', 'public')))
 server.use(morgan('tiny'))
 
 // define a route handler for the repository inspection routines
-server.use("/repos", repos)
+server.use("/api/repos", repos)
 
 // start the server
 server.listen( Global.PORT, () => {

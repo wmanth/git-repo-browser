@@ -1,17 +1,14 @@
 import React, { Component } from 'react'
 import FileNavigator from './FileNavigator'
 import CodeViewer from './CodeViewer'
-import IndexPath from '../common/IndexPath'
-import { FileTree } from '../common/Types'
-import { fetchContent } from '../utils/RepoFetcher'
-import { selectionHandler } from '../App'
+import { GitTree } from '../common/GitTree'
+import { SelectionHandler } from '../App'
 import { Empty } from 'antd'
 
 interface WorkspaceProps {
-	repo: string
-	fileTree: FileTree
-	selected: IndexPath
-	onSelect: selectionHandler
+	gitTree?: GitTree
+	selected?: string
+	onSelect: SelectionHandler
 }
 
 interface WorkspaceState {
@@ -27,22 +24,21 @@ export default class Workspace extends Component<WorkspaceProps, WorkspaceState>
 		}
 	}
 
-	updateSelected() {
-		const blob = this.props.fileTree.objectAtIndexPath(this.props.selected)
-		if (blob) {
-			fetchContent(this.props.repo, blob.sha)
-			.then(content => this.setState({ content: content}))
-			.catch(err => console.error(err));
+	async updateSelected() {
+		var content: string | undefined = undefined
+		if (this.props.selected) {
+			content = await this.props.gitTree?.contentAtPath(this.props.selected)
 		}
+		this.setState({ content: content})
 	}
 
 	render() {
 		return (
-			this.props.selected.isEmpty()
+			!this.props.selected
 			? <Empty style={{ position: 'absolute', top: '50%', left: '50%', transform: 'scale(1.5)' }} image={ Empty.PRESENTED_IMAGE_SIMPLE } />
 			: <React.Fragment>
 					<FileNavigator
-						fileTree={ this.props.fileTree }
+						gitTree={ this.props.gitTree }
 						selected={ this.props.selected }
 						onSelect={ this.props.onSelect }
 					/>
