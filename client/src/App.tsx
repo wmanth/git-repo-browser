@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
-import Layout, { Content, Header } from "antd/lib/layout/layout"
-import Sider from "antd/lib/layout/Sider"
-import TagSelect from "./components/TagSelect"
+//import TagSelect from "./components/TagSelect"
 import FileBrowser from "./components/FileBrowser"
-import Workspace from './components/Workspace'
+// import Workspace from './components/Workspace'
+import SplitView from './components/SplitView'
 import { GitTree } from './common/GitTree'
 import * as RepoFetcher from './utils/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
+import RepoSelector from './components/RepoSelector'
+import RefSelector from './components/RefSelector'
 
 interface AppState {
 	repo: string
@@ -15,6 +16,9 @@ interface AppState {
 	currentTag: string
 	gitTree?: GitTree
 	selected?: string
+	sidebarWidth: number
+	sidebarShiftOn: boolean
+	sidebarShifting: boolean
 }
 
 export type SelectionHandler = (selectedKey: string) => void
@@ -25,6 +29,9 @@ export default class App extends Component {
 		repo: "",
 		tags: [],
 		currentTag: "",
+		sidebarWidth: 200,
+		sidebarShiftOn: false,
+		sidebarShifting: false
 	}
 
 	handleTagChanged(tag: string) {
@@ -69,6 +76,57 @@ export default class App extends Component {
 		})
 	}
 
+	handleMouseMove = (event: any) => {
+		if (this.state.sidebarShifting) {
+			this.setState({ sidebarWidth: this.state.sidebarWidth + event.nativeEvent.movementX})
+		}
+		else {
+			this.setState({ sidebarShiftOn: (Math.abs(event.nativeEvent.clientX - this.state.sidebarWidth) < 3) })
+		}
+	}
+
+	handleMouseDown = () => {
+		this.setState({ sidebarShifting: this.state.sidebarShiftOn })
+	}
+
+	handleMouseUp = () => {
+		this.setState({ sidebarShifting: false })
+	}
+
+	handleRepoSelect = () => {
+
+	}
+
+	sidebar = () => {
+		return (
+			<FileBrowser
+				onSelect={ this.handleSelected.bind(this) }
+				gitTree={ this.state.gitTree }
+				onUpdateTree={ this.handleUpdateTree }/>
+		)
+	}
+	content = <div>Content</div>
+
+	separator = () => <div style={ {fontSize: "large", color: "gray"} }>&rsaquo;</div>
+
+	render() {
+		return (
+			<section className="column">
+				<header>
+					<RepoSelector onSelect={ this.handleRepoSelect }/>
+					<this.separator />
+					<RefSelector />
+					<this.separator />
+				</header>
+				<SplitView sidebar={ this.sidebar() } content={ this.content } />
+				<footer>
+					<div>Footer</div>
+				</footer>
+			</section>
+		)
+	}
+
+	/*
 	render() {
 		return (
 			<Layout style={{ position: "fixed", width: "100%", height: "100%" }}>
@@ -97,5 +155,5 @@ export default class App extends Component {
 				</Layout>
 			</Layout>
 		)
-	}
+	} */
 }

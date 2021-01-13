@@ -1,0 +1,25 @@
+button {
+	border: 0;
+	background: transparent;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+button:hover {
+	background: rgba(50, 50, 180, 0.1);
+}
+
+.dropdown-content {
+	position: absolute;
+	border-radius: 5px;
+	background-color: white;
+	min-width: 160px;
+	box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+
+.dropdown {
+	float: left;
+	overflow: scroll;
+	padding: 10px 10px;
+}

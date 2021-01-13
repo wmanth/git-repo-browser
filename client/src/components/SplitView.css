@@ -1,0 +1,23 @@
+section {
+	background: whitesmoke;
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 1;
+	height: 100%;
+}
+
+.splitbar {
+	width: 4px;
+	background: lightgray;
+}
+
+.primary {
+	border-right: 1px solid lightgray;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.secondary {
+	width: 100%;
+}

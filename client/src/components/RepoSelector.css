@@ -1,0 +1,27 @@
+.repo-item {
+	display: flex;
+	align-items: center;
+	padding: 5px 10px;
+	border-bottom: 1px solid lightgray;
+}
+
+.repo-item:hover {
+	background: whitesmoke;
+}
+
+.repo-name {
+	font-weight: bolder;
+}
+
+.repo-remote {
+	font-size: smaller;
+	color: gray;
+}
+
+.repo-icon {
+
+}
+
+.repo-desc {
+	padding: 5px 10px;
+}
