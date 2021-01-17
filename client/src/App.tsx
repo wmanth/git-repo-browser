@@ -3,12 +3,13 @@ import React, { Component } from 'react'
 import FileBrowser from "./components/FileBrowser"
 // import Workspace from './components/Workspace'
 import SplitView from './components/SplitView'
-import { GitTree } from './common/GitTree'
+import { GitTree, GitTreeNode } from './common/GitTree'
 import * as RepoFetcher from './utils/RepoFetcher'
 import "antd/dist/antd.css"
 import "./App.css"
 import RepoSelector from './components/RepoSelector'
 import RefSelector from './components/RefSelector'
+import GitTreeView from './components/GitTreeView'
 
 interface AppState {
 	repo: string
@@ -21,7 +22,7 @@ interface AppState {
 	sidebarShifting: boolean
 }
 
-export type SelectionHandler = (selectedKey: string) => void
+export type SelectionHandler = (node: GitTreeNode) => void
 export type UpdateTreeHandler = (path: string) => Promise<void>
 
 export default class App extends Component {
@@ -38,9 +39,8 @@ export default class App extends Component {
 		this.updateCurrentTag(tag);
 	}
 
-	async handleSelected(path: string) {
-		const node = await this.state.gitTree?.treeNodeAtPath(path)
-		if (node?.isFile()) this.setState({ selected: node.getPath() })
+	handleSelected = (node: GitTreeNode) => {
+		console.log(node.getPath())
 	}
 
 	handleUpdateTree(path: string): Promise<void> {
@@ -118,7 +118,9 @@ export default class App extends Component {
 					<RefSelector />
 					<this.separator />
 				</header>
-				<SplitView sidebar={ this.sidebar() } content={ this.content } />
+				<SplitView
+					sidebar={ <GitTreeView gitTree={ this.state.gitTree } onSelect={ this.handleSelected } /> }
+					content={ this.content } />
 				<footer>
 					<div>Footer</div>
 				</footer>

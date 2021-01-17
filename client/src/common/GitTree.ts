@@ -24,7 +24,7 @@ export interface GitTreeNode {
 	fetchChilds(): Promise<GitTreeNodeMap>
 }
 
-type GitTreeNodeMap = Map<string, GitTreeNode>
+export type GitTreeNodeMap = Map<string, GitTreeNode>
 
 class GitTreeNodeImpl implements GitTreeNode {
 	private path: string
