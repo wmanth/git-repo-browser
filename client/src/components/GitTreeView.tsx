@@ -76,8 +76,10 @@ interface GitTreeViewItemProps {
 function GitTreeViewItem(props: GitTreeViewItemProps) {
 	const [expanded, setExpanded] = useState(false)
 
+	console.log(`rendering item '${props.node.getPath()}' which is ${expanded ? "expanded" : "collapsed"}`)
+
 	const handleSelect = () => props.onSelect(props.node)
-	const handleToggle = (expanded: boolean) => setExpanded(expanded)
+	const handleToggle = (expanded: boolean) => { console.log(`setting '${props.node.getPath()}' to ${expanded ? "expanded" : "collapsed"}`); setExpanded(expanded) }
 
 	const ItemIcon = () => {
 		const icon =

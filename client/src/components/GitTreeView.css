@@ -1,7 +1,5 @@
 ul {
 	padding-left: 12px;
-	animation: growDown 200ms both;
-	transform-origin: top center;
 }
 
 li {
@@ -44,13 +42,4 @@ li {
 	display: block;
 	flex-shrink: 0;
 	flex-grow: 0;
-}
-
-@keyframes growDown {
-	0% {
-		transform: scaleY(0)
-	}
-	100% {
-		transform: scaleY(1)
-	}
 }

@@ -1,22 +1,20 @@
 import React, { Component } from 'react'
-//import TagSelect from "./components/TagSelect"
-import FileBrowser from "./components/FileBrowser"
-// import Workspace from './components/Workspace'
 import SplitView from './components/SplitView'
 import { GitTree, GitTreeNode } from './common/GitTree'
 import * as RepoFetcher from './utils/RepoFetcher'
-import "antd/dist/antd.css"
-import "./App.css"
+//import "antd/dist/antd.css"
 import RepoSelector from './components/RepoSelector'
 import RefSelector from './components/RefSelector'
 import GitTreeView from './components/GitTreeView'
+import ContentView from './components/ContentView'
+import "./App.css"
 
 interface AppState {
 	repo: string
 	tags: string[]
 	currentTag: string
 	gitTree?: GitTree
-	selected?: string
+	selectedNode?: GitTreeNode
 	sidebarWidth: number
 	sidebarShiftOn: boolean
 	sidebarShifting: boolean
@@ -40,7 +38,8 @@ export default class App extends Component {
 	}
 
 	handleSelected = (node: GitTreeNode) => {
-		console.log(node.getPath())
+		console.log(`selected '${node.getPath()}'`)
+		this.setState({ selectedNode: node })
 	}
 
 	handleUpdateTree(path: string): Promise<void> {
@@ -97,16 +96,6 @@ export default class App extends Component {
 
 	}
 
-	sidebar = () => {
-		return (
-			<FileBrowser
-				onSelect={ this.handleSelected.bind(this) }
-				gitTree={ this.state.gitTree }
-				onUpdateTree={ this.handleUpdateTree }/>
-		)
-	}
-	content = <div>Content</div>
-
 	separator = () => <div style={ {fontSize: "large", color: "gray"} }>&rsaquo;</div>
 
 	render() {
@@ -120,42 +109,11 @@ export default class App extends Component {
 				</header>
 				<SplitView
 					sidebar={ <GitTreeView gitTree={ this.state.gitTree } onSelect={ this.handleSelected } /> }
-					content={ this.content } />
+					content={ <ContentView  /> } />
 				<footer>
 					<div>Footer</div>
 				</footer>
 			</section>
 		)
 	}
-
-	/*
-	render() {
-		return (
-			<Layout style={{ position: "fixed", width: "100%", height: "100%" }}>
-				<Header className="titleBar">
-					<span className="title">{ RepoFetcher.getRepoName(this.state.repo) }</span>
-					<TagSelect
-						onTagChanged={ this.handleTagChanged.bind(this) }
-						tags={ this.state.tags }
-					/>
-				</Header>
-				<Layout>
-					<Sider>
-						<FileBrowser
-							onSelect={ this.handleSelected.bind(this) }
-							gitTree={ this.state.gitTree }
-							onUpdateTree={ this.handleUpdateTree }
-						/>
-					</Sider>
-					<Content>
-						<Workspace
-							gitTree={ this.state.gitTree }
-							selected={ this.state.selected }
-							onSelect={ this.handleSelected.bind(this) }
-						/>
-					</Content>
-				</Layout>
-			</Layout>
-		)
-	} */
 }

@@ -18,40 +18,41 @@ export interface GitTreeNode {
 	isFile(): boolean
 	isDirectory(): boolean
 	isSubmodule(): boolean
+	getTree(): GitTree
 	getPath(): string
 	getChilds(): GitTreeNodeMap | undefined
-
 	fetchChilds(): Promise<GitTreeNodeMap>
 }
 
 export type GitTreeNodeMap = Map<string, GitTreeNode>
 
 class GitTreeNodeImpl implements GitTreeNode {
+	private tree: GitTree
 	private path: string
 	private type: GitTreeEntryType
 	private childs?: GitTreeNodeMap
-	private repoBase: () => string
 
-	constructor(repoBase: () => string, path: string, type: GitTreeEntryType) {
+	constructor(tree: GitTree, path: string, type: GitTreeEntryType) {
+		this.tree = tree
 		this.path = path
 		this.type = type
-		this.repoBase = repoBase
 	}
 
 	isFile = () => (this.type === GitTreeEntryType.File)
 	isDirectory = () => (this.type === GitTreeEntryType.Directory)
 	isSubmodule = () => (this.type === GitTreeEntryType.Submodule)
+	getTree = () => this.tree
 	getPath = () => this.path
 	getChilds = () => this.childs
 
 	async fetchChilds(): Promise<GitTreeNodeMap> {
-		if (!this.isDirectory()) return Promise.reject()
+		if (!this.isDirectory()) return Promise.reject(`Error fetching childs: '${this.path}' is not a directory`)
 		if (!this.childs) {
-			const response = await fetch(`${this.repoBase()}/${this.path}`)
+			const response = await this.tree.fetchPath(this.path)
 			const gitTreeEntries: GitTreeEntry[] = await response.json()
 			const childs: GitTreeNodeMap = new Map()
 			gitTreeEntries.forEach(gitTreeEntry =>
-				childs.set(gitTreeEntry.name, new GitTreeNodeImpl(this.repoBase, gitTreeEntry.path, gitTreeEntry.type)))
+				childs.set(gitTreeEntry.name, new GitTreeNodeImpl(this.tree, gitTreeEntry.path, gitTreeEntry.type)))
 			this.childs = childs
 		}
 		return this.childs
@@ -70,16 +71,13 @@ export class GitTree {
 	constructor(repo: string, ref: string) {
 		this.repo = repo
 		this.ref = ref
-		this.root = new GitTreeNodeImpl(this.getRepoBase.bind(this), "", GitTreeEntryType.Directory)
+		this.root = new GitTreeNodeImpl(this, "", GitTreeEntryType.Directory)
 	}
 
-	private getRepoBase() {
-		return `/api/repos/${this.repo}/refs/${this.ref}`
-	}
+	getRoot = () => this.root
+	getRepo = () => this.repo
 
-	getRoot() {
-		return this.root
-	}
+	fetchPath = (path: string) => fetch(`/api/repos/${this.repo}/refs/${this.ref}/${path}`)
 
 	async treeNodeAtPath(path: string) {
 		let node: GitTreeNode = this.root
@@ -96,7 +94,7 @@ export class GitTree {
 	async contentAtPath(path: string) {
 		const node = await this.treeNodeAtPath(path)
 		if (node && node.isFile) {
-			const response = await fetch (`${this.getRepoBase()}/${node.getPath()}`)
+			const response = await this.fetchPath(node.getPath())
 			const content = await response.text()
 			return content
 		}
