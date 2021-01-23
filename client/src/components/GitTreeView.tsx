@@ -1,68 +1,76 @@
-import { useEffect, useState, Fragment } from "react";
+import { useState, useEffect, useContext, useCallback, createContext, Fragment } from "react";
 import { GitTree, GitTreeNode, GitTreeNodeMap } from "../common/GitTree";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown, faCaretRight, faFolder, faFolderOpen, faFile } from '@fortawesome/free-solid-svg-icons'
+import { faCaretDown, faCaretRight, faFolder, faFolderOpen, faFile, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { faGitSquare } from '@fortawesome/free-brands-svg-icons'
 import { SelectionHandler } from "../App";
 import './GitTreeView.css'
 
 
-type ItemSelectionHandler = (node: GitTreeNode) => void
+interface GitTreeViewContextType {
+	isExpanded: (node: GitTreeNode) => boolean
+	onItemToggle: (node: GitTreeNode) => void
+	onItemSelect: (node: GitTreeNode) => void
+}
+
+const defaultContext: GitTreeViewContextType = {
+	isExpanded: () => false,
+	onItemToggle: () => {},
+	onItemSelect: () => {}
+}
+
+const GitTreeViewContext = createContext<GitTreeViewContextType>(defaultContext)
 
 /* --- CollapsibleIcon --- */
 
-interface CollapsibleIconProps {
-	node: GitTreeNode
-	onToggle: (expanded: boolean) => void
+enum ExpandIconType {
+	Empty, Collapsed, Expanded, Busy
 }
 
-function CollapsibleIcon(props: CollapsibleIconProps) {
-	const [expanded, setExpanded] = useState(false)
+interface CollapsibleIconProps {
+	type: ExpandIconType
+	onToggle?: () => void
+}
 
-	const handleClick = () => {
-		if (props.node.isDirectory()) {
-			const newExpanded = !expanded
-			setExpanded(newExpanded)
-			props.onToggle(newExpanded)
+function ExpandIcon(props: CollapsibleIconProps) {
+
+	const Icon = () => {
+		switch (props.type) {
+			case ExpandIconType.Collapsed:
+				return <FontAwesomeIcon icon={ faCaretRight } color="gray" />
+			case ExpandIconType.Expanded:
+				return <FontAwesomeIcon icon={ faCaretDown } color="gray" />
+			case ExpandIconType.Busy:
+				return <FontAwesomeIcon icon={ faSpinner } className="fa-spin" color="black" />
+			default:
+				return <Fragment />
 		}
 	}
 
-	const icon = () => props.node.isDirectory() ?
-		expanded ?
-			<FontAwesomeIcon icon={ faCaretDown} color="gray"/> :
-			<FontAwesomeIcon icon={ faCaretRight} color="gray"/> :
-		<Fragment />
-
-	return <div className="git-tree-collapse-icon" onClick={ handleClick }>{ icon() }</div>
+	return <div className="git-tree-collapse-icon" onClick={ props.onToggle }><Icon /></div>
 }
 
 /* --- GitTreeViewItemGroup --- */
 
 interface GitTreeViewItemGroupProps {
-	node: GitTreeNode
-	onItemSelect: ItemSelectionHandler
+	nodeMap?: GitTreeNodeMap
 }
 
 function GitTreeViewItemGroup(props: GitTreeViewItemGroupProps) {
-	const [items, setItems] = useState<JSX.Element[]>([])
 
-	useEffect(() => {
-		const nodeMapToItems = (nodeMap: GitTreeNodeMap) => {
-			const childs: JSX.Element[] = []
-			nodeMap.forEach((node, name) =>
-				childs.push(<GitTreeViewItem key={ name } name={ name } node={ node } onSelect={ props.onItemSelect } />))
-			return childs
-		}
+	const items = (nodeMap: GitTreeNodeMap) => {
+		console.log('GitTreeViewItemGroup.items()')
+		const childs: JSX.Element[] = []
+		nodeMap.forEach((node, name) =>
+			childs.push(
+				<GitTreeViewItem
+					key={ name }
+					name={ name }
+					node={ node } />))
+		return childs
+	}
 
-		const childNodeMap = props.node.getChilds()
-		if (childNodeMap) setItems(nodeMapToItems(childNodeMap))
-		else {
-			props.node.fetchChilds()
-			.then(nodeMap => setItems(nodeMapToItems(nodeMap)))
-		}
-	}, [props.node, props.onItemSelect])
-
-	return <ul>{ items }</ul>
+	return props.nodeMap ? <ul>{ items(props.nodeMap) }</ul> : <Fragment />
 }
 
 /* --- GitTreeViewItem --- */
@@ -70,43 +78,69 @@ function GitTreeViewItemGroup(props: GitTreeViewItemGroupProps) {
 interface GitTreeViewItemProps {
 	name: string
 	node: GitTreeNode
-	onSelect: ItemSelectionHandler
 }
 
 function GitTreeViewItem(props: GitTreeViewItemProps) {
-	const [expanded, setExpanded] = useState(false)
+	const context = useContext(GitTreeViewContext)
 
-	console.log(`rendering item '${props.node.getPath()}' which is ${expanded ? "expanded" : "collapsed"}`)
+	const [childNodes, setChildNodes] = useState(props.node.getChilds())
+	const [expandIconType, setExpandIconType] = useState(props.node.isDirectory() ?
+		context.isExpanded(props.node) ?
+			ExpandIconType.Expanded :
+			ExpandIconType.Collapsed :
+		ExpandIconType.Empty)
 
-	const handleSelect = () => props.onSelect(props.node)
-	const handleToggle = (expanded: boolean) => { console.log(`setting '${props.node.getPath()}' to ${expanded ? "expanded" : "collapsed"}`); setExpanded(expanded) }
+	const handleSelect = () => context.onItemSelect(props.node)
+	const handleToggle = () => context.onItemToggle(props.node)
+
+	useEffect(() => {
+		if (!props.node.isDirectory()) {
+			setExpandIconType(ExpandIconType.Empty)
+			setChildNodes(undefined)
+		}
+		else if (context.isExpanded(props.node)) {
+			const childNodeMap = props.node.getChilds()
+			if (childNodeMap) {
+				setExpandIconType(ExpandIconType.Expanded)
+				setChildNodes(childNodeMap)
+			}
+			else {
+				setExpandIconType(ExpandIconType.Busy)
+				props.node.fetchChilds()
+				.then(nodeMap => {
+					setExpandIconType(ExpandIconType.Expanded)
+					setChildNodes(nodeMap)})
+				.catch(reason => console.error(reason))
+			}
+		}
+		else {
+			setExpandIconType(ExpandIconType.Collapsed)
+			setChildNodes(undefined)
+		}
+	}, [props.node, context])
 
 	const ItemIcon = () => {
 		const icon =
 			props.node.isFile() ? <FontAwesomeIcon icon={ faFile } color="gray" /> :
 			props.node.isSubmodule() ? <FontAwesomeIcon icon={ faGitSquare } color="coral" /> :
 			props.node.isDirectory() ?
-				expanded ?
+				context.isExpanded(props.node) ?
 					<FontAwesomeIcon icon={ faFolderOpen } color="lightskyblue" /> :
 					<FontAwesomeIcon icon={ faFolder } color="lightskyblue" /> :
-			<Fragment />
+				<Fragment />
 		return <div className="git-tree-item-icon">{ icon }</div>
 	}
-
-	const ChildItems = () => expanded ?
-		<GitTreeViewItemGroup node={ props.node } onItemSelect={ props.onSelect } /> :
-		<Fragment />
 
 	return (
 		<Fragment>
 			<li>
-				<CollapsibleIcon node={ props.node } onToggle={ handleToggle } />
+				<ExpandIcon type={ expandIconType } onToggle={ handleToggle } />
 				<span className="item-label" onClick={ handleSelect } >
 					<ItemIcon />
 					<span>{ props.name }</span>
 				</span>
 			</li>
-			<ChildItems />
+			<GitTreeViewItemGroup nodeMap={ childNodes }/>
 		</Fragment>
 	)
 }
@@ -119,14 +153,32 @@ interface GitTreeViewProps {
 }
 
 export default function GitTreeView(props: GitTreeViewProps) {
+	const [expandedList, setExpandedList] = useState<string[]>([])
 
-	const handleItemSelect = (node: GitTreeNode) => {
+	const handleIsExpanded = useCallback( (node: GitTreeNode) => {
+		return expandedList.includes(node.getPath())
+	}, [expandedList])
+
+	const handleItemSelect = useCallback( (node: GitTreeNode) => {
 		if (props.onSelect) props.onSelect(node)
+	}, [props])
+
+	const handleItemToggle = useCallback( (node: GitTreeNode) => {
+		const path = node.getPath()
+		setExpandedList(list => list.includes(path) ? list.filter(item => item !== path) : list.concat(path))
+	}, [])
+
+	const context: GitTreeViewContextType = {
+		isExpanded: handleIsExpanded,
+		onItemToggle: handleItemToggle,
+		onItemSelect: handleItemSelect
 	}
 
 	return props.gitTree ?
 		<div className="git-tree">
-			<GitTreeViewItemGroup node={ props.gitTree.getRoot() } onItemSelect={ handleItemSelect } />
+			<GitTreeViewContext.Provider value={ context } >
+				<GitTreeViewItem name="Source" node={ props.gitTree.getRoot() } />
+			</GitTreeViewContext.Provider>
 		</div> :
 		<Fragment />
 }
