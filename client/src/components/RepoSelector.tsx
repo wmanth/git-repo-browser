@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { RepoInventory, RepoInfo } from '../common/RepoInfo'
+import { RepoInventory, RepoInfo } from '../common/GitRepo'
 import DropDown from './DropDown'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGitSquare } from '@fortawesome/free-brands-svg-icons'

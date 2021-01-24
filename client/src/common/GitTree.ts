@@ -1,18 +1,7 @@
+import GitRepo, { GitRef, GitTreeEntry, GitTreeEntryType } from './GitRepo'
 import { normalize } from 'path'
 
 // tslint:disable:max-classes-per-file
-
-export enum GitTreeEntryType {
-	File = 0,
-	Directory = 1,
-	Submodule = 2
-}
-
-export interface GitTreeEntry {
-	name: string
-	path: string
-	type: GitTreeEntryType
-}
 
 export interface GitTreeNode {
 	isFile(): boolean
@@ -64,20 +53,27 @@ class GitTreeNodeImpl implements GitTreeNode {
  * It lazy loads the nodes from the git server when they get accessed.
  */
 export class GitTree {
-	private repo: string
-	private ref: string
+	private repo: GitRepo
+	private ref: GitRef
 	private root: GitTreeNode
 
-	constructor(repo: string, ref: string) {
+	constructor(repo: GitRepo, ref: GitRef) {
 		this.repo = repo
 		this.ref = ref
 		this.root = new GitTreeNodeImpl(this, "", GitTreeEntryType.Directory)
 	}
 
+	static async master(repo: GitRepo) {
+		const branches = await repo.fetchBranches()
+		const masterRef = branches.find(branch => branch.name === 'master')
+		const ref = masterRef ? masterRef : branches[0]
+		return ref ? new GitTree(repo, ref) : undefined
+	}
+
 	getRoot = () => this.root
 	getRepo = () => this.repo
 
-	fetchPath = (path: string) => fetch(`/api/repos/${this.repo}/refs/${this.ref}/${path}`)
+	fetchPath = (path: string) => this.repo.fetchPath(this.ref, path)
 
 	async treeNodeAtPath(path: string) {
 		let node: GitTreeNode = this.root

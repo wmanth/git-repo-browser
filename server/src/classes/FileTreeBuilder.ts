@@ -1,4 +1,4 @@
-import { FileTree, FileTreeNode } from '../common/Types.js'
+import { FileTree, FileTreeNode } from './Types.js'
 import { Tree as GitTree, TreeEntry as GitTreeEntry } from 'nodegit'
 
 export default class FileTreeBuilder {
