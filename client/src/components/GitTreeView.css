@@ -1,9 +1,9 @@
-ul {
+.git-tree-list {
 	padding-left: 12px;
 	margin: 0
 }
 
-li {
+.git-tree-list-item {
 	display: flex;
 	flex-direction: row;
 	flex-shrink: 0;
@@ -15,7 +15,6 @@ li {
 	display: block;
 	overflow: scroll;
 	height: 100%;
-	font-size: smaller;
 }
 
 .item-label {

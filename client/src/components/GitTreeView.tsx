@@ -70,7 +70,7 @@ function GitTreeViewItemGroup(props: GitTreeViewItemGroupProps) {
 		return childs
 	}
 
-	return props.nodeMap ? <ul>{ items(props.nodeMap) }</ul> : <Fragment />
+	return props.nodeMap ? <ul className="git-tree-list">{ items(props.nodeMap) }</ul> : <Fragment />
 }
 
 /* --- GitTreeViewItem --- */
@@ -133,7 +133,7 @@ function GitTreeViewItem(props: GitTreeViewItemProps) {
 
 	return (
 		<Fragment>
-			<li>
+			<li className="git-tree-list-item">
 				<ExpandIcon type={ expandIconType } onToggle={ handleToggle } />
 				<span className="item-label" onClick={ handleSelect } >
 					<ItemIcon />

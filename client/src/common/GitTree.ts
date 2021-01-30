@@ -72,6 +72,7 @@ export class GitTree {
 
 	getRoot = () => this.root
 	getRepo = () => this.repo
+	getRef = () => this.ref
 
 	fetchPath = (path: string) => this.repo.fetchPath(this.ref, path)
 

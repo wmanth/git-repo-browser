@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { Component, Fragment } from 'react'
 import SplitView from './components/SplitView'
 import { GitTree, GitTreeNode } from './common/GitTree'
 import GitRepo, { GitRef } from './common/GitRepo'
@@ -70,24 +70,30 @@ export default class App extends Component {
 	handleRepoSelect = () => {
 	}
 
+	handleRefSelect = (ref: GitRef) => {
+		console.log(`ref ${ref.refName} selected`)
+	}
+
 	separator = () => <div style={ {fontSize: "large", color: "gray"} }>&rsaquo;</div>
 
 	render() {
 		return (
-			<section className="column">
+			<Fragment>
 				<header>
 					<RepoSelector onSelect={ this.handleRepoSelect }/>
 					<this.separator />
-					<RefSelector />
+					<RefSelector gitTree={ this.state.gitTree } onSelect={ this.handleRefSelect }/>
 					<this.separator />
 				</header>
-				<SplitView
-					sidebar={ <GitTreeView gitTree={ this.state.gitTree } onSelect={ this.handleSelected } /> }
-					content={ <ContentView  /> } />
+				<section>
+					<SplitView
+						sidebar={ <GitTreeView gitTree={ this.state.gitTree } onSelect={ this.handleSelected } /> }
+						content={ <ContentView  /> } />
+				</section>
 				<footer>
 					<div>Footer</div>
 				</footer>
-			</section>
+			</Fragment>
 		)
 	}
 }

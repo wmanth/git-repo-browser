@@ -1,12 +1,22 @@
-button {
+.button {
 	border: 0;
 	background: transparent;
+	line-height: 20px;
 	border-radius: 4px;
 	cursor: pointer;
+	background: ghostwhite;
+	height: 20px;
+	border-radius: 11px;
+	border: 1px solid silver;
+	padding: 0 10px;
 }
 
-button:hover {
+.button:hover {
 	background: rgba(50, 50, 180, 0.1);
+}
+
+.dropdown-icon {
+	margin-left: 10px;
 }
 
 .dropdown-content {
@@ -15,11 +25,22 @@ button:hover {
 	background-color: white;
 	min-width: 160px;
 	box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-	z-index: 1;
+	z-index: 2;
 }
 
 .dropdown {
 	float: left;
 	overflow: scroll;
 	padding: 10px 10px;
+}
+
+.dropdown-layer {
+	display: block;
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: transparent;
+	z-index: 1;
 }

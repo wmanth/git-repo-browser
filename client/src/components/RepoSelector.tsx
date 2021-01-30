@@ -58,7 +58,7 @@ export default class RepoSelector extends Component<RepoSelectorProps, RepoSelec
 	render() {
 		return(
 			<DropDown
-				title="RepoSelect"
+				title={ <span>RepoSelect</span> }
 				content={ <this.Content /> }
 				onDropdown={ this.handleDropdown }/>
 		)
