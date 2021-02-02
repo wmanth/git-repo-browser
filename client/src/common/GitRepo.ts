@@ -47,11 +47,20 @@ export default class GitRepo {
 
 	getId = () => this.id
 
+	async fetchRefs() {
+		const refs: GitRef[] = []
+		const refPromisses: Promise<any>[] = []
+		refPromisses.push(this.fetchTags().then(tags => refs.push(...tags)))
+		refPromisses.push(this.fetchBranches().then(branches => refs.push(...branches)))
+		await Promise.all(refPromisses)
+		return refs
+	}
+
 	async fetchBranches() {
 		const response = await fetch(`/api/repos/${this.id}/refs/heads`)
-		const tags: string[] = await response.json()
-		const refs: GitRef[] = tags.map(tag => {
-			return { name: tag, refName: `heads/${tag}`, type: GitRefType.Branch }
+		const branches: string[] = await response.json()
+		const refs: GitRef[] = branches.map(branch => {
+			return { name: branch, refName: `heads/${branch}`, type: GitRefType.Branch }
 		})
 		return refs
 	}
@@ -63,6 +72,13 @@ export default class GitRepo {
 			return { name: tag, refName: `tags/${tag}`, type: GitRefType.Tag }
 		})
 		return refs
+	}
+
+	async defaultBranch() {
+		const branches = await this.fetchBranches()
+		const masterRef = branches.find(branch => branch.name === 'master')
+		const ref = masterRef ? masterRef : branches[0]
+		return ref
 	}
 
 	async fetchPath(ref: GitRef, path: string) {

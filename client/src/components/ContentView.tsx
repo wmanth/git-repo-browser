@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { GitTreeNode } from "../common/GitTree"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCompass } from '@fortawesome/free-regular-svg-icons'
+import './ContentView.css'
 
 
 interface ContentViewProps {
@@ -27,5 +28,5 @@ export default function ContentView(props: ContentViewProps) {
 			language = "javascript"
 			value = { content }
 			options = { options } /> :
-		<div><FontAwesomeIcon icon={ faCompass } color="lightgray" size="10x" /></div>
+		<div className="full-size"><span className="empty"><FontAwesomeIcon icon={ faCompass } size="10x" /></span></div>
 }

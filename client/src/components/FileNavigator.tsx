@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Breadcrumb, Menu } from 'antd';
 import { GitTree, GitTreeNode } from '../common/GitTree';
 import SubMenu from 'antd/lib/menu/SubMenu';
-import { SelectionHandler } from '../App';
+import { SelectionHandler } from '../routes/RepoViewer';
 import './FileNavigator.css'
 
 interface FileNavigatorProps {

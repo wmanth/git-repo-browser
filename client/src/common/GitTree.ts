@@ -35,7 +35,7 @@ class GitTreeNodeImpl implements GitTreeNode {
 	getChilds = () => this.childs
 
 	async fetchChilds(): Promise<GitTreeNodeMap> {
-		if (!this.isDirectory()) return Promise.reject(`Error fetching childs: '${this.path}' is not a directory`)
+		if (!this.isDirectory()) return Promise.reject(new Error(`Fetching childs from '${this.path}' not being a directory`))
 		if (!this.childs) {
 			const response = await this.tree.fetchPath(this.path)
 			const gitTreeEntries: GitTreeEntry[] = await response.json()
@@ -63,10 +63,8 @@ export class GitTree {
 		this.root = new GitTreeNodeImpl(this, "", GitTreeEntryType.Directory)
 	}
 
-	static async master(repo: GitRepo) {
-		const branches = await repo.fetchBranches()
-		const masterRef = branches.find(branch => branch.name === 'master')
-		const ref = masterRef ? masterRef : branches[0]
+	static async defaultTree(repo: GitRepo) {
+		const ref = await repo.defaultBranch()
 		return ref ? new GitTree(repo, ref) : undefined
 	}
 
@@ -76,13 +74,17 @@ export class GitTree {
 
 	fetchPath = (path: string) => this.repo.fetchPath(this.ref, path)
 
+	equals = (gitTree: GitTree) =>
+		this.repo.getId() === gitTree.repo.getId() &&
+		this.ref.refName === gitTree.ref.refName
+
 	async treeNodeAtPath(path: string) {
 		let node: GitTreeNode = this.root
 		const pathSegments = normalize(path).split('/').filter(segment => (segment.length > 0))
 		for (const pathSegment of pathSegments) {
 			const childs = await node.fetchChilds()
 			const childNode = childs.get(pathSegment)
-			if (!childNode) return Promise.reject()
+			if (!childNode) return Promise.reject(new Error(`Node at '${path}' doesn't exist`))
 			node = childNode
 		}
 		return node

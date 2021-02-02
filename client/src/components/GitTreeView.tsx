@@ -1,9 +1,9 @@
-import { useState, useEffect, useContext, useCallback, createContext, Fragment } from "react";
-import { GitTree, GitTreeNode, GitTreeNodeMap } from "../common/GitTree";
+import { useState, useEffect, useContext, useCallback, createContext, Fragment } from "react"
+import { GitTree, GitTreeNode, GitTreeNodeMap } from "../common/GitTree"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretRight, faFolder, faFolderOpen, faFile, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { faGitSquare } from '@fortawesome/free-brands-svg-icons'
-import { SelectionHandler } from "../App";
+import { SelectionHandler } from "../routes/RepoViewer"
 import './GitTreeView.css'
 
 
