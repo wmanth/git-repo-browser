@@ -1,66 +1,81 @@
-import { Component } from 'react'
-import { RepoInventory, RepoInfo } from '../common/GitRepo'
-import DropDown from './DropDown'
+import { Fragment, MouseEvent, useState } from 'react'
+import GitRepo, { RepoInventory, RepoInfo } from '../common/GitRepo'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGitSquare } from '@fortawesome/free-brands-svg-icons'
+import { GitTree } from '../common/GitTree'
+import Popover from './Popover'
 import './RepoSelector.css'
 
-type RepoSelectionHandler = (id: string) => void
+type RepoSelectionHandler = (repo: GitRepo) => void
 
 interface RepoSelectorProps {
-	onSelect: RepoSelectionHandler
-}
-
-interface RepoSelectorState {
-	inventory?: RepoInventory
+	gitTree?: GitTree
+	onSelect?: RepoSelectionHandler
 }
 
 interface RepoItemProps {
 	repoId: string
 	repoInfo: RepoInfo
 }
-export default class RepoSelector extends Component<RepoSelectorProps, RepoSelectorState> {
-	state: RepoSelectorState = {
-	}
+export default function RepoSelector(props: RepoSelectorProps) {
+	const [popoverAnchor, setPopoverAnchor] = useState<any>(null)
 
-	handleDropdown = () => {
+	const fetchInventory = () => {
 		fetch('/api/repos')
 		.then(response => response.json())
-		.then(inventory => this.setState({ inventory: inventory }))
+		.then(inventory => setInventory(inventory))
 	}
 
-	handleItemClick = (id: string) => {
-		console.log('clicked id ', id)
+	const [inventory, setInventory] = useState<RepoInventory | undefined>(() => {
+		fetchInventory()
+		return undefined
+	})
+
+	const Title = () =>
+		<span>{ props.gitTree && inventory ?
+			inventory[props.gitTree.getRepo().getId()].name : "select" }
+		</span>
+
+	const handleItemClick = (id: string) => {
+		if (props.onSelect) props.onSelect(new GitRepo(id))
+		handleClose()
 	}
 
-	repoItems = () => {
-		const repoItems: React.ReactNode[] = []
-		if (this.state.inventory) {
-			Object.entries(this.state.inventory).forEach(([id, repo]) =>
-				repoItems.push(<this.RepoItem key={ id } repoId={ id } repoInfo={ repo }/>)
+	const repoItems = () => {
+		const repoItems: JSX.Element[] = []
+		if (inventory) {
+			Object.entries(inventory).forEach(([id, repo]) =>
+				repoItems.push(<RepoItem key={ id } repoId={ id } repoInfo={ repo }/>)
 			)
 		}
 		return repoItems
 	}
 
-	RepoItem = (props: RepoItemProps) =>
-		<div className="repo-item" onClick={ () => this.handleItemClick(props.repoId) }>
+	const RepoItem = (itemProps: RepoItemProps) => {
+		const className = props.gitTree?.getRepo().getId() === itemProps.repoId ?
+			"repo-item selected" : "repo-item"
+		return <li className={ className } onClick={ () => handleItemClick(itemProps.repoId) }>
 			<span className="repo-icon"><FontAwesomeIcon icon={ faGitSquare } size="3x" /></span>
 			<span className="repo-desc">
-				<div className="repo-name">{ props.repoInfo.name }</div>
-				<div className="repo-remote">{ props.repoInfo.remote }</div>
+				<div className="repo-name">{ itemProps.repoInfo.name }</div>
+				<div className="repo-remote">{ itemProps.repoInfo.remote }</div>
 			</span>
-		</div>
-
-	Content = () =>
-		<div className="repo-select">{ this.repoItems() }</div>
-
-	render() {
-		return(
-			<DropDown
-				title={ <span>RepoSelect</span> }
-				content={ <this.Content /> }
-				onDropdown={ this.handleDropdown }/>
-		)
+		</li>
 	}
+
+	const Content = () =>
+		<ul className="repo-list">{ repoItems() }</ul>
+
+	const handleOpen = (event: MouseEvent<HTMLElement>) =>
+		setPopoverAnchor(event.currentTarget)
+
+	const handleClose = () =>
+		setPopoverAnchor(null)
+
+	return <Fragment>
+		<div className="dropdown-btn" onClick={ handleOpen }><Title /></div>
+		<Popover anchor={ popoverAnchor } onClose={ handleClose }>
+			<Content />
+		</Popover>
+	</Fragment>
 }

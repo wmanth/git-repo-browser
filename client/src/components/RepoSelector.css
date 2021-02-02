@@ -1,3 +1,8 @@
+.repo-list {
+	margin: 0;
+	padding: 0;
+}
+
 .repo-item {
 	display: flex;
 	align-items: center;
@@ -10,16 +15,11 @@
 }
 
 .repo-name {
-	font-weight: bolder;
 }
 
 .repo-remote {
 	font-size: smaller;
 	color: gray;
-}
-
-.repo-icon {
-
 }
 
 .repo-desc {

@@ -1,4 +1,4 @@
-import { Component, Fragment } from 'react'
+import { Fragment, useState } from 'react'
 import SplitView from './components/SplitView'
 import { GitTree, GitTreeNode } from './common/GitTree'
 import GitRepo, { GitRef } from './common/GitRepo'
@@ -8,92 +8,60 @@ import GitTreeView from './components/GitTreeView'
 import ContentView from './components/ContentView'
 import "./App.css"
 
-interface AppState {
-	repo?: GitRepo
-	tags?: GitRef[]
-	currentTag?: GitRef
-	gitTree?: GitTree
-	selectedNode?: GitTreeNode
-}
-
 export type SelectionHandler = (node: GitTreeNode) => void
 export type UpdateTreeHandler = (path: string) => Promise<void>
 
-export default class App extends Component {
-	state: AppState = {}
-
-	handleTagChanged(tag: GitRef) {
-		this.updateCurrentTag(tag);
-	}
-
-	handleSelected = (node: GitTreeNode) => {
-		console.log(`selected '${node.getPath()}'`)
-		this.setState({ selectedNode: node })
-	}
-
-	handleUpdateTree(path: string): Promise<void> {
-		console.log("want to update ", path)
-		return new Promise(resolve => resolve() )
-	}
-
-	componentDidMount() {
+export default function App() {
+	const initializeGitTree = () => {
 		const lastRepo = localStorage.getItem('lastRepo') || ""
 		GitRepo.fetchInventory()
 		.then(inventory => {
 			const repoIds = Object.keys(inventory)
 			const repo = new GitRepo(repoIds.includes(lastRepo) ? lastRepo : repoIds[0])
-			this.updateRepo(repo) })
-		.catch(err => console.error(err));
-	}
-
-	updateRepo(repo: GitRepo) {
-		this.setState({ repo: repo })
-		repo.fetchTags()
-		.then(tags => this.updateTags(tags))
-		.catch(err => console.error(err));
-	}
-
-	updateTags(tags: GitRef[]) {
-		this.setState({ tags: tags })
-		this.updateCurrentTag(tags[0])
-	}
-
-	updateCurrentTag(tag: GitRef) {
-		if (tag.refName === this.state.currentTag?.refName) return
-		this.setState({
-			currentTag: tag,
-			gitTree: this.state.repo ? new GitTree(this.state.repo, tag) : undefined,
-			selected: undefined
+			handleRepoChanged(repo)
 		})
+		.catch(err => console.error(err));
 	}
 
-	handleRepoSelect = () => {
+	const [gitTree, setGitTree] = useState<GitTree | undefined>(() => { initializeGitTree(); return undefined })
+	const [selectedNode, setSelectedNode] = useState<GitTreeNode | undefined>(undefined)
+
+	const handleRefChanged = (ref: GitRef) => {
+		if (gitTree) {
+			setGitTree(new GitTree(gitTree.getRepo(), ref))
+			setSelectedNode(undefined)
+		}
 	}
 
-	handleRefSelect = (ref: GitRef) => {
-		console.log(`ref ${ref.refName} selected`)
+	const handleSelected = (node: GitTreeNode) => {
+		console.log(`selected '${node.getPath()}'`)
+		setSelectedNode(node)
 	}
 
-	separator = () => <div style={ {fontSize: "large", color: "gray"} }>&rsaquo;</div>
-
-	render() {
-		return (
-			<Fragment>
-				<header>
-					<RepoSelector onSelect={ this.handleRepoSelect }/>
-					<this.separator />
-					<RefSelector gitTree={ this.state.gitTree } onSelect={ this.handleRefSelect }/>
-					<this.separator />
-				</header>
-				<section>
-					<SplitView
-						sidebar={ <GitTreeView gitTree={ this.state.gitTree } onSelect={ this.handleSelected } /> }
-						content={ <ContentView  /> } />
-				</section>
-				<footer>
-					<div>Footer</div>
-				</footer>
-			</Fragment>
-		)
+	const handleRepoChanged = (repo: GitRepo) => {
+		GitTree.master(repo)
+		.then(gitTree => setGitTree(gitTree))
+		.catch(err => console.error(err));
 	}
+
+	const Separator = () => <div className="separator">&rsaquo;</div>
+
+	return (
+		<Fragment>
+			<header>
+				<RepoSelector gitTree={ gitTree } onSelect={ handleRepoChanged }/>
+				<Separator />
+				<RefSelector gitTree={ gitTree } onSelect={ handleRefChanged }/>
+				<Separator />
+			</header>
+			<section>
+				<SplitView
+					sidebar={ <GitTreeView gitTree={ gitTree } onSelect={ handleSelected } /> }
+					content={ <ContentView  /> } />
+			</section>
+			<footer>
+				<div>Footer</div>
+			</footer>
+		</Fragment>
+	)
 }

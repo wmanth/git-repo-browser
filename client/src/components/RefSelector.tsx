@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { Fragment, MouseEvent, useState, useEffect } from 'react'
 import { GitRef, GitRefType } from '../common/GitRepo'
 import { GitTree } from '../common/GitTree'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTag, faCodeBranch } from '@fortawesome/free-solid-svg-icons'
-import DropDown from './DropDown'
+import Popover from './Popover'
 import './RefSelector.css'
 
 interface RefSelectorProps {
@@ -19,6 +19,7 @@ export default function RefSelector(props: RefSelectorProps) {
 	const [tags, setTags] = useState<GitRef[]>([])
 	const [branches, setBranches] = useState<GitRef[]>([])
 	const [refTypeSelection, setRefTypeSelection] = useState(SelectionType.Branches)
+	const [popoverAnchor, setPopoverAnchor] = useState<any>(null)
 
 	useEffect(() => {
 		props.gitTree?.getRepo().fetchTags().then(tags => setTags(tags))
@@ -26,6 +27,7 @@ export default function RefSelector(props: RefSelectorProps) {
 	}, [props.gitTree])
 
 	const handleRefSelect = (ref: GitRef) => {
+		setPopoverAnchor(null)
 		if (props.onSelect ) props.onSelect(ref)
 	}
 
@@ -51,7 +53,7 @@ export default function RefSelector(props: RefSelectorProps) {
 	const handleSelectTags = () => setRefTypeSelection(SelectionType.Tags)
 	const handleSelectBranches = () => setRefTypeSelection(SelectionType.Branches)
 
-	const title = () => {
+	const Title = () => {
 		if (!props.gitTree) return <span>select</span>
 		const icon = props.gitTree.getRef().type === GitRefType.Tag ?
 			<FontAwesomeIcon icon={ faTag } color="dimgray" size="sm" /> :
@@ -59,7 +61,7 @@ export default function RefSelector(props: RefSelectorProps) {
 		return <span>{ icon } { props.gitTree.getRef().name }</span>
 	}
 
-	const content = <div className="ref-select">
+	const Content = () => <div className="ref-select">
 		<nav>
 			<div
 				className={ refTypeSelection === SelectionType.Branches ? "nav-item selected" : "nav-item" }
@@ -77,7 +79,16 @@ export default function RefSelector(props: RefSelectorProps) {
 		</ul>
 	</div>
 
-	return (
-		<DropDown title={ title() } content={ content } />
-	)
+	const handleOpen = (event: MouseEvent<HTMLElement>) =>
+		setPopoverAnchor(event.currentTarget)
+
+	const handleClose = () =>
+		setPopoverAnchor(null)
+
+	return <Fragment>
+		<div className="dropdown-btn" onClick={ handleOpen }><Title /></div>
+		<Popover anchor={ popoverAnchor } onClose={ handleClose }>
+			<Content />
+		</Popover>
+	</Fragment>
 }
