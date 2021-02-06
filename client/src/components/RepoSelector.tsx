@@ -37,7 +37,7 @@ export default function RepoSelector(props: RepoSelectorProps) {
 		</span>
 
 	const handleItemClick = (id: string) => {
-		if (props.onSelect) props.onSelect(new GitRepo(id))
+		if (props.onSelect && inventory) props.onSelect(new GitRepo(id, inventory[id]))
 		handleClose()
 	}
 

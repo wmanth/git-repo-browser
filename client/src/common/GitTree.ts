@@ -9,6 +9,7 @@ export interface GitTreeNode {
 	isSubmodule(): boolean
 	getTree(): GitTree
 	getPath(): string
+	getName(): string
 	getChilds(): GitTreeNodeMap | undefined
 	fetchChilds(): Promise<GitTreeNodeMap>
 }
@@ -33,6 +34,7 @@ class GitTreeNodeImpl implements GitTreeNode {
 	getTree = () => this.tree
 	getPath = () => this.path
 	getChilds = () => this.childs
+	getName = () => this.path.split('/').pop() || this.path
 
 	async fetchChilds(): Promise<GitTreeNodeMap> {
 		if (!this.isDirectory()) return Promise.reject(new Error(`Fetching childs from '${this.path}' not being a directory`))

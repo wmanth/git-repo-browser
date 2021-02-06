@@ -34,9 +34,11 @@ export interface GitRef {
 
 export default class GitRepo {
 	private id: string
+	private info: RepoInfo
 
-	constructor(id: string) {
+	constructor(id: string, info: RepoInfo) {
 		this.id = id
+		this.info = info
 	}
 
 	static async fetchInventory() {
@@ -46,6 +48,7 @@ export default class GitRepo {
 	}
 
 	getId = () => this.id
+	getInfo = () => this.info
 
 	async fetchRefs() {
 		const refs: GitRef[] = []

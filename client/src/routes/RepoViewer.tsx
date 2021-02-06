@@ -54,11 +54,17 @@ export default function RepoViewer(props: RouteComponentProps) {
 		})
 	}, [props])
 
+	useEffect(() => {
+		const repoName = gitTree ? `${gitTree.getRepo().getInfo().name} (${gitTree.getRef().name})` : "Git Repo Browser"
+		const nodeName = selectedNode ? `${selectedNode.getName()} - ` : ""
+		document.title = nodeName + repoName
+	}, [gitTree, selectedNode])
+
 	const getRepo = async (repoId: string) => {
 		const inventory = await GitRepo.fetchInventory()
 		const inventoryKeys = Object.keys(inventory)
 		return inventoryKeys.includes(repoId) ?
-			new GitRepo(repoId) :
+			new GitRepo(repoId, inventory[repoId]) :
 			Promise.reject(new Error(`Repository id '${repoId}' does not exist in repository inventory!`))
 	}
 
