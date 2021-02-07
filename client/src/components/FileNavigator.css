@@ -1,4 +1,15 @@
-.ant-breadcrumb.filenavigator {
-    background: white;
-    padding: 0 10pt;
+.breadcrumb-trail {
+	margin: 0;
+	padding: 0;
+}
+
+.breadcrumb {
+	display: inline;
+	padding: 0;
+}
+
+.breadcrumb::before {
+	content: "\203A";
+	color: gray;
+	margin: 0 5px;
 }

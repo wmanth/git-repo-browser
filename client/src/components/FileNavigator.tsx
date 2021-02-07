@@ -1,93 +1,33 @@
-import React, { Component } from 'react'
-import { Breadcrumb, Menu } from 'antd';
-import { GitTree, GitTreeNode } from '../common/GitTree';
-import SubMenu from 'antd/lib/menu/SubMenu';
-import { SelectionHandler } from '../routes/RepoViewer';
+import { useEffect, useState } from 'react'
+import { GitTreeNode } from '../common/GitTree'
 import './FileNavigator.css'
 
 interface FileNavigatorProps {
-	gitTree?: GitTree
-	selected?: string
-	onSelect: SelectionHandler
+	node?: GitTreeNode
 }
 
-interface FileNavigatorState {
-	breadcrumbs: JSX.Element[]
-}
+export default function FileNavigator(props: FileNavigatorProps) {
+	const [nodes, setNodes] = useState<GitTreeNode[]>([])
 
-export default class FileNavigator extends Component<FileNavigatorProps, FileNavigatorState> {
-	state = {
-		breadcrumbs: []
-	}
+	useEffect(() => {
+		const nodes: GitTreeNode[] = []
+		if (props.node) {
+			const nodePathSegments = props.node.getPath().split('/')
+			var nodeSegment: string | undefined
+			var parentNode = props.node.getTree().getRoot()
 
-	handleClick(menuInfo: any) {
-		this.props.onSelect(menuInfo.key)
-	}
-
-	componentDidMount() {
-		this.updateTrail()
-	}
-
-	componentDidUpdate(prevProps: FileNavigatorProps) {
-		if (prevProps.selected !== this.props.selected) {
-			this.updateTrail()
-		}
-	}
-
-	async renderMenu(node: GitTreeNode): Promise<JSX.Element> {
-		const menuItems: JSX.Element[] = []
-		const childs = await node.fetchChilds()
-		childs.forEach((node, name) => this.renderMenuItem(name, node).then(menuItem => menuItems.push(menuItem)))
-		return (
-			<Menu onClick={ this.handleClick.bind(this) }>
-				{ menuItems }
-			</Menu>
-		)
-	}
-
-	async renderMenuItem(name: string, node: GitTreeNode): Promise<JSX.Element> {
-		if (node.isDirectory()) return this.renderSubMenu(name, node)
-		return <Menu.Item key={ node.getPath() }>{ name }</Menu.Item>
-	}
-
-	async renderSubMenu(name: string, node: GitTreeNode): Promise<JSX.Element> {
-		const menuItems: JSX.Element[] = []
-		const childs = await node.fetchChilds()
-		childs.forEach((node, name) => this.renderMenuItem(name, node).then(menuItem => menuItems.push(menuItem)))
-		return <SubMenu key={ node.getPath() } title={ name }>{ menuItems }</SubMenu>
-	}
-
-	async updateTrail() {
-		const breadcrumbs: JSX.Element[] = []
-		if (this.props.selected && this.props.gitTree) {
-			const pathSegments = this.props.selected.split('/')
-			var trailSegment: string | undefined
-			var parentNode = this.props.gitTree.getRoot()
-
-			while ((trailSegment = pathSegments.shift())) {
-				const breadcrumbMenu = await this.renderMenu(parentNode)
-				const breadcrumbNode = parentNode.getChilds()?.get(trailSegment)
-				if (breadcrumbNode) {
-					breadcrumbs.push(
-						<Breadcrumb.Item
-							key={ breadcrumbNode.getPath() }
-							overlay={ breadcrumbMenu }>
-								{ trailSegment }
-						</Breadcrumb.Item>
-					)
-					parentNode = breadcrumbNode
+			while ((nodeSegment = nodePathSegments.shift())) {
+				const node = parentNode.getChilds()?.get(nodeSegment)
+				if (node) {
+					nodes.push(node)
+					parentNode = node
 				}
 			}
 		}
-		this.setState({ breadcrumbs: breadcrumbs })
-	}
+		setNodes(nodes)
+	}, [props.node])
 
-	render() {
-		return (
-			// use &rsaquo; or &#9002; as separator
-			<Breadcrumb className="filenavigator" separator="&rsaquo;">
-				{ this.state.breadcrumbs }
-			</Breadcrumb>
-		)
-	}
+	return <ul className="breadcrumb-trail">
+		{ nodes.map(node => <li key={ node.getPath() } className="breadcrumb">{ node.getName() }</li>) }
+	</ul>
 }

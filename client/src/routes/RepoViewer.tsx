@@ -5,6 +5,7 @@ import { GitTree, GitTreeNode } from '../common/GitTree'
 import GitRepo, { GitRef } from '../common/GitRepo'
 import RepoSelector from '../components/RepoSelector'
 import RefSelector from '../components/RefSelector'
+import FileNavigator from '../components/FileNavigator'
 import GitTreeView from '../components/GitTreeView'
 import ContentView from '../components/ContentView'
 import NotFound from '../components/NotFound'
@@ -121,12 +122,12 @@ export default function RepoViewer(props: RouteComponentProps) {
 				<RepoSelector gitTree={ gitTree } onSelect={ handleRepoSelected }/>
 				<Separator />
 				<RefSelector gitTree={ gitTree } onSelect={ handleRefSelected }/>
-				<Separator />
+				<FileNavigator node={ selectedNode }/>
 			</header>
 			<section>
 				<SplitView
 					sidebar={ <GitTreeView gitTree={ gitTree } onSelect={ handleNodeSelected } /> }
-					content={ <ContentView  /> } />
+					content={ <ContentView node={ selectedNode } /> } />
 			</section>
 			<footer>
 				<div>Footer</div>
