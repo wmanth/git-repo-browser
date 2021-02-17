@@ -1,11 +1,16 @@
+DOCKER_IMAGE ?= wmanth/git-repo-browser
+
 server:
+	@echo "Building server..."
 	npm -C server run build
 
 client:
+	@echo "Building client..."
 	npm -C client run build
 
 image: server client
-	docker build -t wmanth/git-repo-browser .
+	@echo "Building docker image..."
+	docker build -t "$(DOCKER_IMAGE)" .
 
 clean:
 	rm -rf server/dist
