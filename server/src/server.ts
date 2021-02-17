@@ -7,16 +7,21 @@ import { repos } from "./routes/repos.js"
 // tslint:disable:no-console
 const server = express()
 
-// host static react client
-server.use(express.static(path.resolve('dist', 'public')))
-
 // log HTTP requests
 server.use(morgan('tiny'))
+
+// host static react client resources
+server.use(express.static(path.resolve('dist', 'public')))
 
 // define a route handler for the repository inspection routines
 server.use("/api/repos", repos)
 
+// forward all other routes to the react client app
+server.get('*', (req, res) => {
+	res.sendFile(path.resolve('dist', 'public', 'index.html'));
+})
+
 // start the server
 server.listen( Global.PORT, () => {
-    console.log(`listening on port ${Global.PORT}`)
+	console.log(`listening on port ${Global.PORT}`)
 })
