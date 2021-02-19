@@ -1,9 +1,9 @@
-import { Fragment } from "react";
+import { Fragment, MouseEvent } from "react";
 import './Popover.css'
 
 interface PopoverProps {
 	anchor?: HTMLElement
-	onClose?: () => void
+	onClose?: (event: MouseEvent<HTMLElement>) => void
 	children: JSX.Element
 }
 
@@ -15,8 +15,8 @@ export default function Popover(props: PopoverProps) {
 		})
 	}
 
-	const handleClick = () => {
-		if (props.onClose) props.onClose()
+	const handleClick = (event: MouseEvent<HTMLElement>) => {
+		if (props.onClose) props.onClose(event)
 	}
 
 	return props.anchor ?
