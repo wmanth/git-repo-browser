@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { createContext, useCallback, useEffect, useState } from 'react'
 import { RouteComponentProps } from 'react-router-dom'
 import SplitView from '../components/SplitView'
 import { GitTree, GitTreeNode } from '../common/GitTree'
@@ -16,14 +16,20 @@ export type UpdateTreeHandler = (path: string) => Promise<void>
 
 export const RepoViewerRoute = '/repo'
 
+interface RepoViewerContextType {
+	selectNode: (node: GitTreeNode) => void
+}
+
+export const RepoViewerContext = createContext<RepoViewerContextType>({
+	selectNode: () => {}
+})
+
 export default function RepoViewer(props: RouteComponentProps) {
 	const [gitTree, setGitTree] = useState<GitTree | undefined>()
 	const [selectedNode, setSelectedNode] = useState<GitTreeNode | undefined>()
 	const [isValid, setValid] = useState(true)
 
 	useEffect(() => {
-		console.log('RepoViewer useEffect')
-
 		const decodeRouterPath = async (routerPath: string) => {
 			const regex = new RegExp(`^${RepoViewerRoute}/?(\\w*)/?(.*)?$`, 'g')
 			const match = regex.exec(routerPath)
@@ -104,34 +110,34 @@ export default function RepoViewer(props: RouteComponentProps) {
 		}
 	}
 
-	const handleNodeSelected = (node: GitTreeNode) => {
+	const handleSelectNode = useCallback( (node: GitTreeNode) => {
 		console.log(`selected node '${node.getPath()}'`)
 		props.history.push(`${RepoViewerRoute}/${node.getTree().getRepo().getId()}/${node.getTree().getRef().refName}/${node.getPath()}`)
-	}
+	}, [props.history])
 
-	const handleRepoSelected = (repo: GitRepo) => {
+	const handleSelectRepo = useCallback( (repo: GitRepo) => {
 		console.log(`selected repo '${repo.getId()}'`)
 		props.history.push(`${RepoViewerRoute}/${repo.getId()}`)
-	}
+	}, [props.history])
 
 	const Separator = () => <div className="separator">&rsaquo;</div>
 
 	return isValid ?
-		<Fragment>
+		<RepoViewerContext.Provider value={ {selectNode: handleSelectNode} }>
 			<header>
-				<RepoSelector gitTree={ gitTree } onSelect={ handleRepoSelected }/>
+				<RepoSelector gitTree={ gitTree } onSelect={ handleSelectRepo }/>
 				<Separator />
 				<RefSelector gitTree={ gitTree } onSelect={ handleRefSelected }/>
 				<FileNavigator node={ selectedNode }/>
 			</header>
 			<section>
 				<SplitView
-					sidebar={ <GitTreeView gitTree={ gitTree } onSelect={ handleNodeSelected } /> }
+					sidebar={ <GitTreeView gitTree={ gitTree } /> }
 					content={ <ContentView node={ selectedNode } /> } />
 			</section>
 			<footer>
 				<div>Footer</div>
 			</footer>
-		</Fragment> :
+		</RepoViewerContext.Provider> :
 		<NotFound />
 }

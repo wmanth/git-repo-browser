@@ -1,6 +1,25 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { RepoViewerContext } from '../routes/RepoViewer'
 import { GitTreeNode } from '../common/GitTree'
 import './FileNavigator.css'
+
+interface BreadcrumbProps {
+	node: GitTreeNode
+}
+
+function Breadcrumb(props: BreadcrumbProps) {
+	const context = useContext(RepoViewerContext)
+
+	const handleClick = () => {
+		context.selectNode(props.node)
+	}
+
+	return <li
+		onClick={ handleClick }
+		className="breadcrumb">
+			{ props.node.getName() }
+	</li>
+}
 
 interface FileNavigatorProps {
 	node?: GitTreeNode
@@ -28,6 +47,6 @@ export default function FileNavigator(props: FileNavigatorProps) {
 	}, [props.node])
 
 	return <ul className="breadcrumb-trail">
-		{ nodes.map(node => <li key={ node.getPath() } className="breadcrumb">{ node.getName() }</li>) }
+		{ nodes.map(node => <Breadcrumb key={ node.getPath() } node={ node } />) }
 	</ul>
 }

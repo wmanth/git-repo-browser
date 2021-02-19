@@ -4,8 +4,14 @@
 }
 
 .breadcrumb {
+	color: dimgray;
 	display: inline;
 	padding: 0;
+	cursor: pointer;
+}
+
+.breadcrumb:hover {
+	color: black;
 }
 
 .breadcrumb::before {
