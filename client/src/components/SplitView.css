@@ -1,4 +1,4 @@
-section {
+.split-view {
 	background: whitesmoke;
 	display: flex;
 	flex-direction: row;

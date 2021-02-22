@@ -38,6 +38,11 @@ export default function RepoViewer(props: RouteComponentProps) {
 	const [gitTree, setGitTree] = useState<GitTree | undefined>()
 	const [selectedNode, setSelectedNode] = useState<GitTreeNode | undefined>()
 	const [error, setError] = useState<Error | undefined>()
+    const [config, setConfig] = useState<any>(() => {
+        fetch('/config')
+        .then(response => response.json())
+        .then(config => setConfig(config))
+    })
 
 	const setState = (state: RepoViewerState) => {
 		setGitTree(state.gitTree)
@@ -130,17 +135,22 @@ export default function RepoViewer(props: RouteComponentProps) {
 		<NotFound message={ error.message }/> :
 		<RepoViewerContext.Provider value={ {selectNode: handleSelectNode} }>
 			<header>
-				<RepoSelector gitTree={ gitTree } onSelect={ handleSelectRepo }/>
-				<Separator />
-				<RefSelector gitTree={ gitTree } onSelect={ handleRefSelected }/>
-				<FileNavigator node={ selectedNode }/>
+				<section className="navbar fix-row">
+					<span className="title">{ config?.title }</span>
+				</section>
+				<section className="navigator fix-row">
+					<RepoSelector gitTree={ gitTree } onSelect={ handleSelectRepo }/>
+					<Separator />
+					<RefSelector gitTree={ gitTree } onSelect={ handleRefSelected }/>
+					<FileNavigator node={ selectedNode }/>
+				</section>
 			</header>
-			<section>
+			<section className="flex-row">
 				<SplitView
 					sidebar={ <GitTreeView gitTree={ gitTree } /> }
 					content={ <ContentView node={ selectedNode } /> } />
 			</section>
-			<footer>
+			<footer className="fix-row">
 				<div>Footer</div>
 			</footer>
 		</RepoViewerContext.Provider>

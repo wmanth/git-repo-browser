@@ -44,7 +44,7 @@ export default class SplitView extends Component<SplitViewProps, SplitViewState>
 
 	render() {
 		return (
-			<section
+			<section className="split-view"
 				onMouseMove={ this.handleMouseMove }
 				onMouseDown={ this.handleMouseDown }
 				onMouseUp={ this.handleMouseUp }
