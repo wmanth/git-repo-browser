@@ -1,5 +1,3 @@
-// tslint:disable:max-classes-per-file
-
 import IndexPath from "./IndexPath"
 
 // see: https://stackoverflow.com/questions/15877362/declare-and-initialize-a-dictionary-in-typescript

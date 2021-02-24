@@ -1,133 +1,56 @@
-import path from "path";
-import express from "express";
-import Git, { Reference } from "nodegit"
-import FileTreeBuilder from "../classes/FileTreeBuilder.js"
-import * as Global from "../globals.js"
+import path from 'path'
+import express from 'express'
+import * as Global from '../globals.js'
+import { Directory, Submodule } from '../apis/api.js'
+import { GitHubRepoDesc, NodegitRepoDesc, RepoType } from '../classes/Inventory.js'
+import GitHubAPI from '../apis/github.js'
+import NodegitAPI from '../apis/nodegit.js'
 
 export const repos = express.Router()
 
-function getRepoPath(id: string) {
-	return path.join(Global.REPO_HOME, Global.RepoInventory.getEntry(id).local)
+function GetRepoAPI(id: string) {
+	const repoDesc = Global.RepoInventory.getRepoDesc(id)
+	switch (repoDesc.type) {
+		case RepoType.LOCAL:
+			return new NodegitAPI(repoDesc as NodegitRepoDesc)
+
+		case RepoType.GITHUB:
+			return new GitHubAPI(repoDesc as GitHubRepoDesc)
+	}
 }
 
 // list all tags in the repository
 repos.get("/", (req, res, next) =>
-	res.json(Global.RepoInventory.allEntries())
+	res.json(Global.RepoInventory.allRepoDescs())
 )
 
-// list all tags in the repository
-repos.get("/:id/tags", (req, res, next) =>
-	Git.Repository.openBare(getRepoPath(req.params.id))
-	.then(repo => Git.Tag.list(repo))
-	.then(tags => res.json(tags))
-	.catch(reason => next(reason))
+repos.get("/:id", (req, res, next) =>
+	res.json(Global.RepoInventory.getRepoDesc(req.params.id))
 )
 
-// list all files in the repository for the given tag name
-repos.get("/:id/filetree", (req, res, next) =>
-	Git.Repository.openBare(getRepoPath(req.params.id))
-	.then(repo => repo.getReferenceCommit(`refs/tags/${req.query.tag}`))
-	.then(commit => commit.getTree())
-	.then(tree => FileTreeBuilder.build(tree))
-	.then(fileTree => res.json(fileTree.childs))
-	.catch(reason => next(reason))
-)
-
-// provide the content of the blob determined by given sha
-repos.get("/:id/blobs/:sha/content", (req, res, next) =>
-	Git.Repository.openBare(getRepoPath(req.params.id))
-	.then(repo => repo.getBlob(req.params.sha as string))
-	.then(blob => res.send(blob.content()))
-	.catch(reason => next(reason))
-)
-
-
+// list all refs in the repository
 repos.get("/:id/refs", (req, res, next) =>
-	Git.Repository.openBare(getRepoPath(req.params.id))
-	.then(repo => repo.getReferenceNames(Reference.TYPE.LISTALL))
- 	.then(refs => res.json(refs.map(ref => ref.slice('refs/'.length))))
+	GetRepoAPI(req.params.id).fetchRefs()
+	.then(refs => res.json(refs))
 	.catch(reason => next(reason))
 )
 
-// list all tags in the repository
-repos.get("/:id/refs/:ref", (req, res, next) => {
-	const prefix = `refs/${req.params.ref}/`
-	return Git.Repository.openBare(getRepoPath(req.params.id))
-	.then(repo => repo.getReferenceNames(Reference.TYPE.LISTALL))
+// list all names of a specific ref type
+repos.get("/:id/refs/:ref", (req, res, next) =>
+	GetRepoAPI(req.params.id).fetchRefs()
 	.then(refs => res.json(refs
-		.filter(ref => ref.startsWith(prefix))
-		.map(ref => ref.slice(prefix.length))))
+		.filter(ref => ref.startsWith(req.params.ref))
+		.map(ref => ref.slice(req.params.ref.length + 1))))
 	.catch(reason => next(reason))
-})
-
-enum EntryType {
-	File = 0,
-	Directory = 1,
-	Submodule = 2
-}
-
-interface Entry {
-	name: string
-	path: string
-	type: EntryType
-}
-
-function gitTreeEntryToItem(entry: Git.TreeEntry): Entry {
-	return {
-		name: entry.name(),
-		path: entry.path(),
-		type: entry.isSubmodule() ? EntryType.Submodule
-			: entry.isDirectory() ? EntryType.Directory
-			: EntryType.File
-	}
-}
+)
 
 // return the content of a file addressed by <ref-path>/<file-path>
 repos.get("/:id/refs/*", async (req, res, next) => {
-	try {
-		const repo = await Git.Repository.openBare(getRepoPath(req.params.id))
-		const refs = await repo.getReferenceNames(Reference.TYPE.LISTALL)
-
-		// split the wildcard path into a ref-path and file-path
-		const refPathElements: string[] = ["refs"]
-		const filePathElements = req.params[0].split('/')
-		let refPath: string
-		let filePath: string
-		while (filePathElements.length) {
-			refPathElements.push(filePathElements.shift())
-			refPath = refPathElements.join('/')
-			filePath = filePathElements.join('/')
-			if (refs.includes(refPath)) break
-		}
-
-		// fetch the referenced commit
-		// see https://github.com/nodegit/nodegit/issues/1370
-		const ref = await repo.getReference(refPath)
-		const obj = await ref.peel(Git.Object.TYPE.COMMIT)
-		const oid = obj.id()
-		const commit = await repo.getCommit(oid)
-
-		// if the root is requested fetch the tree from the commit
-		if (filePath.length === 0) {
-			const tree = await commit.getTree()
-			res.json(tree.entries().map(gitTreeEntryToItem))
-		}
-		// otherwise fetch the path entry first
-		else {
-			const entry = await commit.getEntry(filePath)
-			if (entry.isBlob()) {
-				const blob = await repo.getBlob(entry.sha())
-				res.send(blob.content())
-			}
-			else if (entry.isTree()) {
-				const tree = await entry.getTree()
-				res.json(tree.entries().map(gitTreeEntryToItem))
-			}
-			else if (entry.isSubmodule) {
-				res.json(entry.sha())
-			}
-		}
-	} catch (error) {
-		return next(error)
-	}
+	GetRepoAPI(req.params.id).fetchTreeEntry(req.params[0])
+	.then(result => {
+		if (result instanceof Buffer) res.send(result)
+		else if (result instanceof Directory) res.json(result.getEntries())
+		else if (result instanceof Submodule) res.json({ sha: result.getSha()})
+	})
+	.catch (reason => next(reason))
 })
