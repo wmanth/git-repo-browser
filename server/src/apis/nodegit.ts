@@ -2,7 +2,12 @@ import { join } from 'path'
 import { REPO_HOME } from '../globals.js'
 import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api.js'
 import Git, { Reference } from 'nodegit'
-import { NodegitRepoDesc } from '../classes/Inventory.js'
+import { RepoDesc } from '../routes/repos.js'
+
+export interface NodegitRepoDesc extends RepoDesc {
+	local: string
+	remote: string
+}
 
 function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 	return {
@@ -16,6 +21,8 @@ function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 
 export default class NodegitAPI extends RepoAPI {
 	private path: string
+
+	static TYPE = "local"
 
 	constructor(desc: NodegitRepoDesc) {
 		super(desc)

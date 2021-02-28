@@ -1,7 +1,13 @@
 import fetch, { Headers } from 'node-fetch'
 import { log } from '../globals.js'
-import { GitHubRepoDesc } from '../classes/Inventory.js'
+import { RepoDesc } from '../routes/repos.js'
 import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js'
+
+export interface GitHubRepoDesc extends RepoDesc {
+	owner: string
+	repo: string
+	token: string | undefined
+}
 
 function githubObjectToItem(content: any): TreeEntry {
 	return {
@@ -17,6 +23,8 @@ export default class GitHubAPI extends RepoAPI {
 	private repo: string
 	private token?: string
 	private baseUrl: string
+
+	static TYPE = "github"
 
 	constructor(desc: GitHubRepoDesc) {
 		super(desc)

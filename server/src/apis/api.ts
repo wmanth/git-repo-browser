@@ -1,4 +1,4 @@
-import { RepoDesc } from '../classes/Inventory.js'
+import { RepoDesc } from '../routes/repos.js'
 
 export enum TreeEntryType {
 	File = "file",
@@ -21,7 +21,6 @@ export class Submodule {
 	constructor(private sha: string) { }
 	getSha(): string { return this.sha }
 }
-
 
 export default abstract class RepoAPI {
 
