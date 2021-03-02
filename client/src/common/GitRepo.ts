@@ -11,9 +11,9 @@ interface Dictionary<T> {
 export type RepoInventory = Dictionary<RepoInfo>
 
 export enum GitTreeEntryType {
-	File = 0,
-	Directory = 1,
-	Submodule = 2
+	File = 'file',
+	Directory = 'directory',
+	Submodule = 'submodule'
 }
 
 export interface GitTreeEntry {
@@ -22,14 +22,10 @@ export interface GitTreeEntry {
 	type: GitTreeEntryType
 }
 
-export enum GitRefType {
-	Branch, Tag
-}
-
-export interface GitRef {
-	name: string
-	refName: string
-	type: GitRefType
+export class GitRef {
+	constructor(readonly name: string, readonly refName: string) {}
+	isTag() { return this.refName.startsWith('tags' ) }
+	isBranch() { return this.refName.startsWith('heads' ) }
 }
 
 export default class GitRepo {
@@ -51,11 +47,12 @@ export default class GitRepo {
 	getInfo = () => this.info
 
 	async fetchRefs() {
-		const refs: GitRef[] = []
-		const refPromisses: Promise<any>[] = []
-		refPromisses.push(this.fetchTags().then(tags => refs.push(...tags)))
-		refPromisses.push(this.fetchBranches().then(branches => refs.push(...branches)))
-		await Promise.all(refPromisses)
+		const response = await fetch(`/api/repos/${this.id}/refs`)
+		const refNames: string[] = await response.json()
+		const refs: GitRef[] = refNames.map(refName => {
+			const [, name] = refName.split('/', 2)
+			return new GitRef(name, refName)
+		})
 		return refs
 	}
 
@@ -63,7 +60,7 @@ export default class GitRepo {
 		const response = await fetch(`/api/repos/${this.id}/refs/heads`)
 		const branches: string[] = await response.json()
 		const refs: GitRef[] = branches.map(branch => {
-			return { name: branch, refName: `heads/${branch}`, type: GitRefType.Branch }
+			return new GitRef(branch, `heads/${branch}`)
 		})
 		return refs
 	}
@@ -72,7 +69,7 @@ export default class GitRepo {
 		const response = await fetch(`/api/repos/${this.id}/refs/tags`)
 		const tags: string[] = await response.json()
 		const refs: GitRef[] = tags.map(tag => {
-			return { name: tag, refName: `tags/${tag}`, type: GitRefType.Tag }
+			return new GitRef(tag, `tags/${tag}`)
 		})
 		return refs
 	}

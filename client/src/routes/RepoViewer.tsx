@@ -31,7 +31,7 @@ export default function RepoViewer(props: RouteComponentProps) {
 
 	useEffect(() => {
 		const decodeRouterPath = async (routerPath: string) => {
-			const regex = new RegExp(`^${RepoViewerRoute}/?(\\w*)/?(.*)?$`, 'g')
+			const regex = new RegExp(`^${RepoViewerRoute}/?([\\w.-]*)/?(.*)?$`, 'g')
 			const match = regex.exec(routerPath)
 			const repoId = match ? match[1] : undefined
 			const refPath = match ? match[2] : undefined

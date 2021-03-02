@@ -1,5 +1,5 @@
 import { Fragment, MouseEvent, useState, useEffect } from 'react'
-import { GitRef, GitRefType } from '../common/GitRepo'
+import { GitRef } from '../common/GitRepo'
 import { GitTree } from '../common/GitTree'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTag, faCodeBranch } from '@fortawesome/free-solid-svg-icons'
@@ -55,9 +55,13 @@ export default function RefSelector(props: RefSelectorProps) {
 
 	const Title = () => {
 		if (!props.gitTree) return <span>select</span>
-		const icon = props.gitTree.getRef().type === GitRefType.Tag ?
-			<FontAwesomeIcon icon={ faTag } color="dimgray" size="sm" /> :
-			<FontAwesomeIcon icon={ faCodeBranch } color="dimgray" size="sm" />
+		const ref = props.gitTree.getRef()
+		const icon =
+			ref.isTag() ?
+				<FontAwesomeIcon icon={ faTag } color="dimgray" size="sm" /> :
+			ref.isBranch() ?
+				<FontAwesomeIcon icon={ faCodeBranch } color="dimgray" size="sm" /> :
+			<Fragment />
 		return <span>{ icon } { props.gitTree.getRef().name }</span>
 	}
 
