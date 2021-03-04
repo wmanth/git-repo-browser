@@ -4,11 +4,11 @@ import { normalize } from 'path'
 // tslint:disable:max-classes-per-file
 
 export interface GitTreeNode {
+	tree: GitTree
+	path: string
 	isFile(): boolean
 	isDirectory(): boolean
 	isSubmodule(): boolean
-	getTree(): GitTree
-	getPath(): string
 	getName(): string
 	getChilds(): GitTreeNodeMap | undefined
 	fetchChilds(): Promise<GitTreeNodeMap>
@@ -17,22 +17,16 @@ export interface GitTreeNode {
 export type GitTreeNodeMap = Map<string, GitTreeNode>
 
 class GitTreeNodeImpl implements GitTreeNode {
-	private tree: GitTree
-	private path: string
-	private type: GitTreeEntryType
 	private childs?: GitTreeNodeMap
 
-	constructor(tree: GitTree, path: string, type: GitTreeEntryType) {
-		this.tree = tree
-		this.path = path
-		this.type = type
-	}
+	constructor(
+		readonly tree: GitTree,
+		readonly path: string,
+		private type: GitTreeEntryType) {}
 
 	isFile = () => (this.type === GitTreeEntryType.File)
 	isDirectory = () => (this.type === GitTreeEntryType.Directory)
 	isSubmodule = () => (this.type === GitTreeEntryType.Submodule)
-	getTree = () => this.tree
-	getPath = () => this.path
 	getChilds = () => this.childs
 	getName = () => this.path.split('/').pop() || this.path
 
@@ -55,13 +49,9 @@ class GitTreeNodeImpl implements GitTreeNode {
  * It lazy loads the nodes from the git server when they get accessed.
  */
 export class GitTree {
-	private repo: GitRepo
-	private ref: GitRef
-	private root: GitTreeNode
+	readonly root: GitTreeNode
 
-	constructor(repo: GitRepo, ref: GitRef) {
-		this.repo = repo
-		this.ref = ref
+	constructor(readonly repo: GitRepo, readonly ref: GitRef) {
 		this.root = new GitTreeNodeImpl(this, "", GitTreeEntryType.Directory)
 	}
 
@@ -70,17 +60,14 @@ export class GitTree {
 		return ref ? new GitTree(repo, ref) : undefined
 	}
 
-	getRoot = () => this.root
-	getRepo = () => this.repo
-	getRef = () => this.ref
-
 	fetchPath = (path: string) => this.repo.fetchPath(this.ref, path)
 
 	equals = (gitTree: GitTree) =>
-		this.repo.getId() === gitTree.repo.getId() &&
+		this.repo.id === gitTree.repo.id &&
 		this.ref.refName === gitTree.ref.refName
 
 	async treeNodeAtPath(path: string) {
+		if (!path.length) return this.root
 		let node: GitTreeNode = this.root
 		const pathSegments = normalize(path).split('/').filter(segment => (segment.length > 0))
 		for (const pathSegment of pathSegments) {
@@ -94,8 +81,8 @@ export class GitTree {
 
 	async contentAtPath(path: string) {
 		const node = await this.treeNodeAtPath(path)
-		if (node && node.isFile) {
-			const response = await this.fetchPath(node.getPath())
+		if (node && node.isFile()) {
+			const response = await this.fetchPath(node.path)
 			const content = await response.text()
 			return content
 		}

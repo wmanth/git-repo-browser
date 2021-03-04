@@ -15,7 +15,7 @@ export default function ContentView(props: ContentViewProps) {
 
 	useEffect(() => {
 		if (props.node?.isFile()) {
-			props.node.getTree().fetchPath(props.node.getPath())
+			props.node.tree.fetchPath(props.node.path)
 			.then(response => response.text())
 			.then(content => setContent(content))
 		}

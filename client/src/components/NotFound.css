@@ -1,7 +1,18 @@
-.message {
+.notfound {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 	width: 100%;
+	color: lightgray;
+}
+
+.notfound .title {
 	font-size: 48pt;
 	font-weight: 600;
-	text-align: center;
-	color: lightgray;
+	margin: 0
+}
+
+.notfound .subtitle {
+	font-size: 12pt;
+	font-weight: 400;
 }

@@ -1,12 +1,17 @@
-import { Fragment } from 'react'
-import { RouteComponentProps } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+	import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDizzy } from '@fortawesome/free-regular-svg-icons'
 import './NotFound.css'
 
-export default function NotFound() {
+interface NotFoundProps {
+	message: string
+}
 
-	return <Fragment>
-		<div className="full-size"><span className="message">4<FontAwesomeIcon icon={ faDizzy } />4</span></div>
-	</Fragment>
+export default function NotFound(props: NotFoundProps) {
+
+	return <div className="full-size">
+		<div className="notfound">
+			<div className="title">4<FontAwesomeIcon icon={ faDizzy } />4</div>
+			<div className="subtitle">{ props.message }</div>
+		</div>
+	</div>
 }

@@ -22,8 +22,8 @@ export default function RefSelector(props: RefSelectorProps) {
 	const [popoverAnchor, setPopoverAnchor] = useState<any>(null)
 
 	useEffect(() => {
-		props.gitTree?.getRepo().fetchTags().then(tags => setTags(tags))
-		props.gitTree?.getRepo().fetchBranches().then(branches => setBranches(branches))
+		props.gitTree?.repo.fetchTags().then(tags => setTags(tags))
+		props.gitTree?.repo.fetchBranches().then(branches => setBranches(branches))
 	}, [props.gitTree])
 
 	const handleRefSelect = (ref: GitRef) => {
@@ -32,7 +32,7 @@ export default function RefSelector(props: RefSelectorProps) {
 	}
 
 	const refItemClassName = (ref: GitRef) => {
-		return props.gitTree?.getRef().refName === ref.refName ?
+		return props.gitTree?.ref.refName === ref.refName ?
 			"ref-item selected" : "ref-item"
 	}
 
@@ -55,14 +55,13 @@ export default function RefSelector(props: RefSelectorProps) {
 
 	const Title = () => {
 		if (!props.gitTree) return <span>select</span>
-		const ref = props.gitTree.getRef()
 		const icon =
-			ref.isTag() ?
+			props.gitTree.ref.isTag() ?
 				<FontAwesomeIcon icon={ faTag } color="dimgray" size="sm" /> :
-			ref.isBranch() ?
+			props.gitTree.ref.isBranch() ?
 				<FontAwesomeIcon icon={ faCodeBranch } color="dimgray" size="sm" /> :
 			<Fragment />
-		return <span>{ icon } { props.gitTree.getRef().name }</span>
+		return <span>{ icon } { props.gitTree.ref.name }</span>
 	}
 
 	const Content = () => <div className="ref-select">

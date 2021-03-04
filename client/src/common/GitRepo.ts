@@ -29,13 +29,7 @@ export class GitRef {
 }
 
 export default class GitRepo {
-	private id: string
-	private info: RepoInfo
-
-	constructor(id: string, info: RepoInfo) {
-		this.id = id
-		this.info = info
-	}
+	constructor(readonly id: string, readonly info: RepoInfo) {}
 
 	static async fetchInventory() {
 		const response = await fetch('/api/repos')
@@ -43,8 +37,21 @@ export default class GitRepo {
 		return inventory
 	}
 
-	getId = () => this.id
-	getInfo = () => this.info
+	static async defaultRepo() {
+		const inventory = await this.fetchInventory()
+		const inventoryKeys = Object.keys(inventory)
+		return inventoryKeys.length ?
+			new GitRepo(inventoryKeys[0], inventory[inventoryKeys[0]]) :
+			Promise.reject(new Error('No repository found in inventory'))
+	}
+
+	static async getRepo(id: string) {
+		const inventory = await this.fetchInventory()
+		const inventoryKeys = Object.keys(inventory)
+		return inventoryKeys.includes(id) ?
+			new GitRepo(id, inventory[id]) :
+			Promise.reject(new Error(`Repository id '${id}' does not exist in repository inventory!`))
+	}
 
 	async fetchRefs() {
 		const response = await fetch(`/api/repos/${this.id}/refs`)
@@ -79,6 +86,12 @@ export default class GitRepo {
 		const masterRef = branches.find(branch => branch.name === 'master')
 		const ref = masterRef ? masterRef : branches[0]
 		return ref
+	}
+
+	async findRef(refPath: string) {
+		const refs = await this.fetchRefs()
+		const ref = refs.find(ref => refPath.startsWith(ref.refName))
+		return ref ? ref : Promise.reject(new Error(`No ref found for '${refPath}`))
 	}
 
 	async fetchPath(ref: GitRef, path: string) {

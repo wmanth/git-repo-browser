@@ -16,6 +16,10 @@ export type UpdateTreeHandler = (path: string) => Promise<void>
 
 export const RepoViewerRoute = '/repo'
 
+const routeToRepo = (repo: GitRepo) => `${RepoViewerRoute}/${repo.id}`
+const routeToRef = (repo: GitRepo, ref: GitRef) => `${routeToRepo(repo)}/${ref.refName}`
+const routeToNode = (node: GitTreeNode) => `${routeToRef(node.tree.repo, node.tree.ref)}/${node.path}`
+
 interface RepoViewerContextType {
 	selectNode: (node: GitTreeNode) => void
 }
@@ -24,105 +28,106 @@ export const RepoViewerContext = createContext<RepoViewerContextType>({
 	selectNode: () => {}
 })
 
+interface RepoViewerState {
+	gitTree?: GitTree
+	selectedNode?: GitTreeNode
+	error?: Error
+}
+
 export default function RepoViewer(props: RouteComponentProps) {
 	const [gitTree, setGitTree] = useState<GitTree | undefined>()
 	const [selectedNode, setSelectedNode] = useState<GitTreeNode | undefined>()
-	const [isValid, setValid] = useState(true)
+	const [error, setError] = useState<Error | undefined>()
 
-	useEffect(() => {
-		const decodeRouterPath = async (routerPath: string) => {
-			const regex = new RegExp(`^${RepoViewerRoute}/?([\\w.-]*)/?(.*)?$`, 'g')
-			const match = regex.exec(routerPath)
-			const repoId = match ? match[1] : undefined
-			const refPath = match ? match[2] : undefined
-			if (!repoId) {
-				const newRepoId = await getDefaultRepoId()
-				return newRepoId ? `${RepoViewerRoute}/${newRepoId}` : undefined
-			}
-			const repo = await getRepo(repoId)
-			if (refPath) {
-				await validateRefPath(repo, refPath)
-			}
-			else {
-				const branch = await repo.defaultBranch()
-				return `${RepoViewerRoute}/${repoId}/${branch.refName}`
-			}
-			return undefined
+	const setState = (state: RepoViewerState) => {
+		setGitTree(state.gitTree)
+		setSelectedNode(state.selectedNode)
+		setError(state.error)
+		if (state.error) console.log(state.error)
+	}
+
+	const validateTree = useCallback( (gitTree: GitTree, route: string) => {
+		const match = new RegExp(`^${routeToRef(gitTree.repo, gitTree.ref)}/?(.*)$`).exec(route)
+		const nodePath = match ? match[1] : undefined
+		if (nodePath === undefined) setState({ error: new Error(`Invalid route '${route}'`) })
+		else {
+			gitTree.treeNodeAtPath(nodePath)
+			.then(node => setState({ gitTree: gitTree, selectedNode: node }))
+			.catch(err => setState({ error: err }))
 		}
+	}, [])
 
-		decodeRouterPath(props.location.pathname)
-		.then(replace => {
-			if (replace) props.history.replace(replace)
-			else setValid(true)
-		})
-		.catch(err => {
-			console.error(err)
-			setValid(false)
-		})
-	}, [props])
+	const validateRepo = useCallback( (repo: GitRepo, route: string) => {
+		const match = new RegExp(`^${routeToRepo(repo)}/?(.*)$`).exec(route)
+		const refPath = match ? match[1] : undefined
+		if (refPath === undefined) setState({ error: new Error(`Invalid route '${route}'`) })
+		else if (!refPath.length) {
+			repo.defaultBranch()
+			.then(ref => props.history.replace(routeToRef(repo, ref)))
+			.catch(err => setState({ error: err }))
+		}
+		else {
+			repo.findRef(refPath)
+			.then(ref => validateTree(new GitTree(repo, ref), route))
+			.catch(err => setState({ error: err }))
+		}
+	}, [props, validateTree])
+
+	const validateRoute = useCallback( (route: string) => {
+		const match = new RegExp(`^${RepoViewerRoute}/?([\\w.-]*)/?.*$`, 'g').exec(route)
+		const repoId = match ? match[1] : undefined
+		if (repoId === undefined) setState({ error: new Error(`Invalid route '${route}'`) })
+		else if (!repoId.length) {
+			GitRepo.defaultRepo()
+			.then(repo => props.history.replace(routeToRepo(repo)))
+			.catch(err => setState({ error: err }))
+		}
+		else {
+			GitRepo.getRepo(repoId)
+			.then(repo => validateRepo(repo, route))
+			.catch(err => setState({ error: err }))
+		}
+	}, [props, validateRepo])
 
 	useEffect(() => {
-		const repoName = gitTree ? `${gitTree.getRepo().getInfo().name} (${gitTree.getRef().name})` : "Git Repo Browser"
+		if (selectedNode && props.location.pathname === routeToNode(selectedNode)) return
+		else if (gitTree && props.location.pathname.startsWith(routeToRef(gitTree.repo, gitTree.ref))) {
+			validateTree(gitTree, props.location.pathname)
+		}
+		else if (gitTree && props.location.pathname.startsWith(routeToRepo(gitTree.repo))) {
+			validateRepo(gitTree.repo, props.location.pathname)
+		}
+		else {
+			validateRoute(props.location.pathname)
+		}
+	}, [props, gitTree, selectedNode, validateTree, validateRepo, validateRoute])
+
+	useEffect(() => {
+		const repoName = gitTree ? `${gitTree.repo.info.name} (${gitTree.ref.name})` : "Git Repo Browser"
 		const nodeName = selectedNode ? `${selectedNode.getName()} - ` : ""
 		document.title = nodeName + repoName
 	}, [gitTree, selectedNode])
 
-	const getRepo = async (repoId: string) => {
-		const inventory = await GitRepo.fetchInventory()
-		const inventoryKeys = Object.keys(inventory)
-		return inventoryKeys.includes(repoId) ?
-			new GitRepo(repoId, inventory[repoId]) :
-			Promise.reject(new Error(`Repository id '${repoId}' does not exist in repository inventory!`))
-	}
-
-	const getDefaultRepoId = async () => {
-		const lastRepoId = localStorage.getItem('repo')
-		const inventory = await GitRepo.fetchInventory()
-		const inventoryKeys = Object.keys(inventory)
-		return lastRepoId && inventoryKeys.includes(lastRepoId) ? lastRepoId : inventoryKeys[0]
-	}
-
-	const validateRefPath = async (repo: GitRepo, refPath: string) => {
-		// validate git ref
-		const refs = await repo.fetchRefs()
-		let nodePath: string | undefined
-		const foundRef = refs.find(ref => {
-			const regex = new RegExp(`^${ref.refName}(?:/(.*))?$`, 'g')
-			const match = regex.exec(refPath)
-			nodePath = match ? match[1] : undefined
-			return match
-		})
-		if (!foundRef) return Promise.reject(new Error(`No matching branch on repository '${repo.getId()}' found!`))
-
-		// validate node path
-		const gitTree = new GitTree(repo, foundRef)
-		setGitTree(prevTree => prevTree?.equals(gitTree) ? prevTree : gitTree)
-		if (nodePath) {
-			const node = await gitTree.treeNodeAtPath(nodePath)
-			setSelectedNode(node)
-		}
-		else setSelectedNode(undefined)
-	}
-
 	const handleRefSelected = (ref: GitRef) => {
 		if (gitTree) {
-			props.history.push(`${RepoViewerRoute}/${gitTree.getRepo().getId()}/${ref.refName}`)
+			props.history.push(`${RepoViewerRoute}/${gitTree.repo.id}/${ref.refName}`)
 		}
 	}
 
 	const handleSelectNode = useCallback( (node: GitTreeNode) => {
-		console.log(`selected node '${node.getPath()}'`)
-		props.history.push(`${RepoViewerRoute}/${node.getTree().getRepo().getId()}/${node.getTree().getRef().refName}/${node.getPath()}`)
+		console.log(`selected node '${node.path}'`)
+		props.history.push(`${RepoViewerRoute}/${node.tree.repo.id}/${node.tree.ref.refName}/${node.path}`)
 	}, [props.history])
 
 	const handleSelectRepo = useCallback( (repo: GitRepo) => {
-		console.log(`selected repo '${repo.getId()}'`)
-		props.history.push(`${RepoViewerRoute}/${repo.getId()}`)
+		console.log(`selected repo '${repo.id}'`)
+		props.history.push(`${RepoViewerRoute}/${repo.id}`)
 	}, [props.history])
 
 	const Separator = () => <div className="separator">&rsaquo;</div>
 
-	return isValid ?
+	return error ?
+		<NotFound message={ error.message }/> :
 		<RepoViewerContext.Provider value={ {selectNode: handleSelectNode} }>
 			<header>
 				<RepoSelector gitTree={ gitTree } onSelect={ handleSelectRepo }/>
@@ -138,6 +143,5 @@ export default function RepoViewer(props: RouteComponentProps) {
 			<footer>
 				<div>Footer</div>
 			</footer>
-		</RepoViewerContext.Provider> :
-		<NotFound />
+		</RepoViewerContext.Provider>
 }

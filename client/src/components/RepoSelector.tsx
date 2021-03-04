@@ -33,7 +33,7 @@ export default function RepoSelector(props: RepoSelectorProps) {
 
 	const Title = () =>
 		<span>{ props.gitTree && inventory ?
-			inventory[props.gitTree.getRepo().getId()].name : "select" }
+			inventory[props.gitTree.repo.id].name : "select" }
 		</span>
 
 	const handleItemClick = (id: string) => {
@@ -52,7 +52,7 @@ export default function RepoSelector(props: RepoSelectorProps) {
 	}
 
 	const RepoItem = (itemProps: RepoItemProps) => {
-		const className = props.gitTree?.getRepo().getId() === itemProps.repoId ?
+		const className = props.gitTree?.repo.id === itemProps.repoId ?
 			"repo-item selected" : "repo-item"
 		return <li className={ className } onClick={ () => handleItemClick(itemProps.repoId) }>
 			<span className="repo-icon"><FontAwesomeIcon icon={ faGitSquare } size="3x" /></span>

@@ -154,12 +154,13 @@ export default function GitTreeView(props: GitTreeViewProps) {
 	const [expandedList, setExpandedList] = useState<string[]>([])
 
 	const handleIsExpanded = useCallback( (node: GitTreeNode) => {
-		return expandedList.includes(node.getPath())
+		return expandedList.includes(node.path)
 	}, [expandedList])
 
 	const handleItemToggle = useCallback( (node: GitTreeNode) => {
-		const path = node.getPath()
-		setExpandedList(list => list.includes(path) ? list.filter(item => item !== path) : list.concat(path))
+		setExpandedList(list => list.includes(node.path) ?
+			list.filter(item => item !== node.path) :
+			list.concat(node.path))
 	}, [])
 
 	const context: GitTreeViewContextType = {
@@ -170,7 +171,7 @@ export default function GitTreeView(props: GitTreeViewProps) {
 	return props.gitTree ?
 		<div className="git-tree">
 			<GitTreeViewContext.Provider value={ context } >
-				<GitTreeViewItem name="Source" node={ props.gitTree.getRoot() } />
+				<GitTreeViewItem name="Source" node={ props.gitTree.root } />
 			</GitTreeViewContext.Provider>
 		</div> :
 		<Fragment />

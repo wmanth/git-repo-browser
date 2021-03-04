@@ -31,9 +31,9 @@ export default function FileNavigator(props: FileNavigatorProps) {
 	useEffect(() => {
 		const nodes: GitTreeNode[] = []
 		if (props.node) {
-			const nodePathSegments = props.node.getPath().split('/')
+			const nodePathSegments = props.node.path.split('/')
 			var nodeSegment: string | undefined
-			var parentNode = props.node.getTree().getRoot()
+			var parentNode = props.node.tree.root
 
 			while ((nodeSegment = nodePathSegments.shift())) {
 				const node = parentNode.getChilds()?.get(nodeSegment)
@@ -47,6 +47,6 @@ export default function FileNavigator(props: FileNavigatorProps) {
 	}, [props.node])
 
 	return <ul className="breadcrumb-trail">
-		{ nodes.map(node => <Breadcrumb key={ node.getPath() } node={ node } />) }
+		{ nodes.map(node => <Breadcrumb key={ node.path } node={ node } />) }
 	</ul>
 }
