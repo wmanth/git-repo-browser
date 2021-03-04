@@ -6,7 +6,8 @@ import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.j
 export interface GitHubRepoDesc extends RepoDesc {
 	owner: string
 	repo: string
-	token: string | undefined
+	base?: string
+	token?: string
 }
 
 function githubObjectToItem(content: any): TreeEntry {
@@ -31,7 +32,7 @@ export default class GitHubAPI extends RepoAPI {
 		this.owner = desc.owner
 		this.repo = desc.repo
 		this.token = desc.token
-		this.baseUrl = 'https://api.github.com'
+		this.baseUrl = desc.base || 'https://api.github.com'
 	}
 
 	getHeaders() {
