@@ -4,20 +4,25 @@ import util from 'util'
 import express from 'express'
 import * as Global from '../globals.js'
 import { Directory, Submodule } from '../apis/api.js'
-import GitHubAPI, { GitHubRepoDesc } from '../apis/github.js'
-import NodegitAPI, { NodegitRepoDesc } from '../apis/nodegit.js'
+import GitHubAPI, { GitHubRepoInfo } from '../apis/github.js'
+import NodegitAPI, { NodegitRepoInfo } from '../apis/nodegit.js'
 
 export const repos = express.Router()
 
-export interface RepoDesc {
+export interface RepoInfo {
 	name: string
 	type: string
+	url: string
+}
+
+export interface RepoInventory {
+	[id: string]: RepoInfo
 }
 
 // https://stackoverflow.com/questions/46867517
 const readFile = util.promisify(fs.readFile)
 
-async function readRepoDescs() {
+async function readRepoInventory() {
 	const reposPath = path.join(Global.REPO_HOME, 'repos.json')
 	const reposData = await readFile(reposPath, 'utf8')
 	if (!reposData)
@@ -25,8 +30,8 @@ async function readRepoDescs() {
 	return JSON.parse(reposData)
 }
 
-async function findRepoDesc(id: string): Promise<RepoDesc> {
-	const repoDescs = await readRepoDescs()
+async function findRepoDesc(id: string): Promise<RepoInfo> {
+	const repoDescs = await readRepoInventory()
 	const repoDesc = repoDescs[id]
 	if (!repoDesc)
 		return Promise.reject(new Error(`Repo '${id}' does not exist`))
@@ -35,20 +40,32 @@ async function findRepoDesc(id: string): Promise<RepoDesc> {
 
 // API factory. Cannot be moved to api.js due to ReferenceError
 // https://dmitripavlutin.com/javascript-variables-and-temporal-dead-zone/
-function getRepoAPI(repoDesc: RepoDesc) {
+function getRepoAPI(repoDesc: RepoInfo) {
 	switch (repoDesc.type) {
 		case NodegitAPI.TYPE:
-			return new NodegitAPI(repoDesc as NodegitRepoDesc)
+			return new NodegitAPI(repoDesc as NodegitRepoInfo)
 
 		case GitHubAPI.TYPE:
-			return new GitHubAPI(repoDesc as GitHubRepoDesc)
+			return new GitHubAPI(repoDesc as GitHubRepoInfo)
 	}
+}
+
+function publishedInventory (inventory: any) {
+	const result: RepoInventory = {}
+	Object.keys(inventory).forEach(key => {
+		result[key] = {
+			name: inventory[key].name,
+			type: inventory[key].type,
+			url: inventory[key].url
+		}
+	})
+	return result
 }
 
 // list all tags in the repository
 repos.get("/", (req, res, next) =>
-	readRepoDescs()
-	.then(repoDescs => res.json(repoDescs))
+	readRepoInventory()
+	.then(inventory => res.json(publishedInventory(inventory)))
 	.catch(reason => next(reason))
 )
 

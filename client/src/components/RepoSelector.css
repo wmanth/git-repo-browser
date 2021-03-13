@@ -8,6 +8,7 @@
 	align-items: center;
 	padding: 5px 10px;
 	border-bottom: 1px solid lightgray;
+	cursor: pointer;
 }
 
 .repo-item:hover {
@@ -17,7 +18,7 @@
 .repo-name {
 }
 
-.repo-remote {
+.repo-url {
 	font-size: smaller;
 	color: gray;
 }

@@ -2,9 +2,9 @@ import { join } from 'path'
 import { REPO_HOME } from '../globals.js'
 import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api.js'
 import Git, { Reference } from 'nodegit'
-import { RepoDesc } from '../routes/repos.js'
+import { RepoInfo } from '../routes/repos.js'
 
-export interface NodegitRepoDesc extends RepoDesc {
+export interface NodegitRepoInfo extends RepoInfo {
 	local: string
 	remote: string
 }
@@ -24,7 +24,7 @@ export default class NodegitAPI extends RepoAPI {
 
 	static TYPE = "local"
 
-	constructor(desc: NodegitRepoDesc) {
+	constructor(desc: NodegitRepoInfo) {
 		super(desc)
 		this.path = join(REPO_HOME, desc.local)
 	}

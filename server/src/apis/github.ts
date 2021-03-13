@@ -1,9 +1,9 @@
 import fetch, { Headers } from 'node-fetch'
 import { log } from '../globals.js'
-import { RepoDesc } from '../routes/repos.js'
+import { RepoInfo } from '../routes/repos.js'
 import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js'
 
-export interface GitHubRepoDesc extends RepoDesc {
+export interface GitHubRepoInfo extends RepoInfo {
 	owner: string
 	repo: string
 	base?: string
@@ -27,7 +27,7 @@ export default class GitHubAPI extends RepoAPI {
 
 	static TYPE = "github"
 
-	constructor(desc: GitHubRepoDesc) {
+	constructor(desc: GitHubRepoInfo) {
 		super(desc)
 		this.owner = desc.owner
 		this.repo = desc.repo
