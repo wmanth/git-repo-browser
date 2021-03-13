@@ -1,14 +1,4 @@
-export interface RepoInfo {
-    name: string
-    local: string
-    remote: string
-}
-
-interface Dictionary<T> {
-	[key: string]: T
-}
-
-export type RepoInventory = Dictionary<RepoInfo>
+import { RepoInfo } from '@wmanth/git-repo-server'
 
 export enum GitTreeEntryType {
 	File = 'file',
@@ -33,7 +23,7 @@ export default class GitRepo {
 
 	static async fetchInventory() {
 		const response = await fetch('/api/repos')
-		const inventory: RepoInventory = await response.json()
+		const inventory = await response.json()
 		return inventory
 	}
 

@@ -1,7 +1,8 @@
 import { Fragment, MouseEvent, useState } from 'react'
-import GitRepo, { RepoInventory, RepoInfo } from '../common/GitRepo'
+import GitRepo from '../common/GitRepo'
+import { RepoInfo, RepoInventory } from '@wmanth/git-repo-server'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGitSquare } from '@fortawesome/free-brands-svg-icons'
+import { faGitSquare, faGithubSquare } from '@fortawesome/free-brands-svg-icons'
 import { GitTree } from '../common/GitTree'
 import Popover from './Popover'
 import './RepoSelector.css'
@@ -17,12 +18,12 @@ interface RepoItemProps {
 	repoId: string
 	repoInfo: RepoInfo
 }
+
 export default function RepoSelector(props: RepoSelectorProps) {
 	const [popoverAnchor, setPopoverAnchor] = useState<any>(null)
 
 	const fetchInventory = () => {
-		fetch('/api/repos')
-		.then(response => response.json())
+		GitRepo.fetchInventory()
 		.then(inventory => setInventory(inventory))
 	}
 
@@ -52,13 +53,15 @@ export default function RepoSelector(props: RepoSelectorProps) {
 	}
 
 	const RepoItem = (itemProps: RepoItemProps) => {
+		const iconType = itemProps.repoInfo.type === "github" ?
+			faGithubSquare : faGitSquare
 		const className = props.gitTree?.repo.id === itemProps.repoId ?
 			"repo-item selected" : "repo-item"
 		return <li className={ className } onClick={ () => handleItemClick(itemProps.repoId) }>
-			<span className="repo-icon"><FontAwesomeIcon icon={ faGitSquare } size="3x" /></span>
+			<span className="repo-icon"><FontAwesomeIcon icon={ iconType } size="3x" /></span>
 			<span className="repo-desc">
 				<div className="repo-name">{ itemProps.repoInfo.name }</div>
-				<div className="repo-remote">{ itemProps.repoInfo.remote }</div>
+				<div className="repo-url">{ itemProps.repoInfo.url }</div>
 			</span>
 		</li>
 	}

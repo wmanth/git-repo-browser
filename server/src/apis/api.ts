@@ -1,4 +1,4 @@
-import { RepoDesc } from '../routes/repos.js'
+import { RepoInfo } from '../routes/repos.js'
 
 export enum TreeEntryType {
 	File = "file",
@@ -24,7 +24,7 @@ export class Submodule {
 
 export default abstract class RepoAPI {
 
-	constructor(desc: RepoDesc) {}
+	constructor(desc: RepoInfo) {}
 
 	abstract fetchRefs(): Promise<string[]>
 	abstract fetchContent(ref: string, path: string): Promise<Buffer | Directory | Submodule>
