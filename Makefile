@@ -1,15 +1,10 @@
-DOCKER_IMAGE ?= wmanth/git-repo-browser
+DOCKER_IMAGE ?= wmanth/repo-browser
 
-server:
-	@echo "Building server..."
+all:
 	npm -C server run build
-
-client:
-	@echo "Building client..."
 	npm -C client run build
 
-image: server client
-	@echo "Building docker image..."
+image:
 	docker build -t "$(DOCKER_IMAGE)" .
 
 clean:
@@ -21,4 +16,4 @@ cleanAll: clean
 	rm -rf server/node_modules
 	rm -rf client/node_modules
 
-.PHONY: server client clean
+.PHONY: server client image clean cleanAll
