@@ -1,7 +1,8 @@
-import Editor from "@monaco-editor/react"
-import { useEffect, useState } from "react"
-import { GitTreeNode } from "../common/GitTree"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import Editor from '@monaco-editor/react'
+import FolderView from '../components/FolderView'
+import { useEffect, useState } from 'react'
+import { GitTreeNode } from '../common/GitTree'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCompass } from '@fortawesome/free-regular-svg-icons'
 import './ContentView.css'
 
@@ -28,5 +29,7 @@ export default function ContentView(props: ContentViewProps) {
 			language = "javascript"
 			value = { content }
 			options = { options } /> :
+		props.node?.isDirectory() ?
+		<FolderView node={ props.node }/> :
 		<div className="full-size"><span className="empty"><FontAwesomeIcon icon={ faCompass } size="10x" /></span></div>
 }

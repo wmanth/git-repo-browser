@@ -6,11 +6,11 @@
 	flex-direction: column;
 }
 
-.navbar {
+#root > header > .navbar {
 	margin: 10px 0;
 }
 
-.title {
+#root > header > .navbar > .title {
 	font-size: x-large;
 	font-weight: 200;
 }
@@ -33,12 +33,12 @@
 	margin: 10px 0;
 }
 
-header {
+#root > header {
 	border-bottom: 1px solid lightgray;
 	padding: 0 20px;
 }
 
-footer {
+#root > footer {
 	color: dimgray;
 	background: whitesmoke;
 	border-top: 1px solid lightgray;
