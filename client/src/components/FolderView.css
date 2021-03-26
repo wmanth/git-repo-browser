@@ -1,0 +1,79 @@
+.folder-view {
+	background: white;
+	display: block;
+	overflow: scroll;
+	height: 100%;
+	padding: 5px 10px;
+}
+
+.folder-view > header {
+	padding: 5px;
+	border-top: 1px solid lightgray;
+}
+
+.folder-view > header:first-of-type {
+	border-top: none;
+}
+
+.folder-view > header > .title {
+	font-size: larger;
+	color: dimgray;
+	cursor: pointer;
+}
+
+.folder-view > header > .title::before {
+	font-family: 'Font Awesome 5 Free';
+	font-weight: 900;
+	content: "\f107";
+	display: inline-block;
+	width: 1em;
+}
+
+.folder-view > header.collapsed > .title::before {
+	content: "\f105";
+}
+
+.folder-view > ul {
+	background: white;
+	display: flex;
+	flex-wrap: wrap;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.folder-view > ul.collapsed {
+	display: none;
+}
+
+.folder-view > ul > li {
+	border: none;
+	margin: 2px;
+	padding: 3px;
+	width: 100px;
+	height: 100px;
+	text-align:center;
+	cursor: pointer;
+}
+
+.folder-view > ul > li:hover {
+	z-index: 1;
+}
+
+.folder-view > ul > li > .title {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	word-break: break-all;
+	margin-top: 5px;
+	padding: 2px
+}
+
+.folder-view > ul > li:hover > .title {
+	border-radius: 5px;
+	outline: 3px solid white;
+	background-color: lavender;
+	-webkit-line-clamp: 100;
+}
