@@ -20,3 +20,8 @@ code {
 	height: 100%;
 	align-items: center;
 }
+
+.inline-center {
+	display: flex;
+	align-items: center;
+}

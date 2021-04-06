@@ -1,8 +1,7 @@
 import { Fragment, MouseEvent, useState, useEffect } from 'react'
 import { GitRef } from '../common/GitRepo'
 import { GitTree } from '../common/GitTree'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTag, faCodeBranch } from '@fortawesome/free-solid-svg-icons'
+import { GoGitBranch, GoTag } from 'react-icons/go'
 import Popover from './Popover'
 import './RefSelector.css'
 
@@ -56,12 +55,10 @@ export default function RefSelector(props: RefSelectorProps) {
 	const Title = () => {
 		if (!props.gitTree) return <span>select</span>
 		const icon =
-			props.gitTree.ref.isTag() ?
-				<FontAwesomeIcon icon={ faTag } color="dimgray" size="sm" /> :
-			props.gitTree.ref.isBranch() ?
-				<FontAwesomeIcon icon={ faCodeBranch } color="dimgray" size="sm" /> :
+			props.gitTree.ref.isTag() ? <GoTag className="ref-icon" /> :
+			props.gitTree.ref.isBranch() ? <GoGitBranch  className="ref-icon" /> :
 			<Fragment />
-		return <span>{ icon } { props.gitTree.ref.name }</span>
+		return <Fragment>{ icon } { props.gitTree.ref.name }</Fragment>
 	}
 
 	const Content = () => <div className="ref-select">
@@ -69,12 +66,12 @@ export default function RefSelector(props: RefSelectorProps) {
 			<div
 				className={ refTypeSelection === SelectionType.Branches ? "nav-item selected" : "nav-item" }
 				onClick={ handleSelectBranches }>
-					<span><FontAwesomeIcon icon={ faCodeBranch } color="dimgray" size="sm" /> Branches</span>
+					<span className="inline-center"><GoGitBranch className="ref-icon" />Branches</span>
 			</div>
 			<div
 				className={ refTypeSelection === SelectionType.Tags ? "nav-item selected" : "nav-item" }
 				onClick={ handleSelectTags }>
-					<span><FontAwesomeIcon icon={ faTag } color="dimgray" size="sm" /> Tags</span>
+					<span className="inline-center"><GoTag className="ref-icon" />Tags</span>
 			</div>
 		</nav>
 		<ul className="ref-list" >

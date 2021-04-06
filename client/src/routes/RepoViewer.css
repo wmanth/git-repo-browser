@@ -27,8 +27,6 @@
 }
 
 .navigator {
-	display: flex;
-	align-items: center;
 	background: whitesmoke;
 	margin: 10px 0;
 }
@@ -58,6 +56,8 @@
 .dropdown-btn {
 	border: 0;
 	background: transparent;
+	display: flex;
+	align-items: center;
 	line-height: 20px;
 	border-radius: 4px;
 	cursor: pointer;

@@ -39,3 +39,7 @@ nav {
 .ref-item,.nav-item {
 	cursor: pointer;
 }
+
+.ref-icon {
+	margin-right: 3px;
+}
