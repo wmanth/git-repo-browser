@@ -138,7 +138,7 @@ export default function RepoViewer(props: RouteComponentProps) {
 				<section className="navbar fix-row">
 					<span className="title">{ config?.title }</span>
 				</section>
-				<section className="navigator fix-row">
+				<section className="navigator fix-row inline-center">
 					<RepoSelector gitTree={ gitTree } onSelect={ handleSelectRepo }/>
 					<Separator />
 					<RefSelector gitTree={ gitTree } onSelect={ handleRefSelected }/>
