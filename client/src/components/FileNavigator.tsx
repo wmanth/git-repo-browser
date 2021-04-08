@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { RepoViewerContext } from '../routes/RepoViewer'
 import { GitTreeNode } from '../common/GitTree'
-import './FileNavigator.css'
+import './FileNavigator.scss'
 
 interface BreadcrumbProps {
 	node: GitTreeNode

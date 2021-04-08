@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGitSquare, faGithubSquare } from '@fortawesome/free-brands-svg-icons'
 import { GitTree } from '../common/GitTree'
 import Popover from './Popover'
-import './RepoSelector.css'
+import './RepoSelector.scss'
 
 type RepoSelectionHandler = (repo: GitRepo) => void
 

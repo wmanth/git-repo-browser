@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { GitTreeNode } from '../common/GitTree'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCompass } from '@fortawesome/free-regular-svg-icons'
-import './ContentView.css'
+import './ContentView.scss'
 
 
 interface ContentViewProps {

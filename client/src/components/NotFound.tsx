@@ -1,6 +1,6 @@
 	import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDizzy } from '@fortawesome/free-regular-svg-icons'
-import './NotFound.css'
+import './NotFound.scss'
 
 interface NotFoundProps {
 	message: string

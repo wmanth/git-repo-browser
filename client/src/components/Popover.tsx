@@ -1,5 +1,5 @@
 import { Fragment, MouseEvent } from "react";
-import './Popover.css'
+import './Popover.scss'
 
 interface PopoverProps {
 	anchor?: HTMLElement

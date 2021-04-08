@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter, Redirect, Route, Switch } from 'react-router-dom'
 import RepoViewer, { RepoViewerRoute } from './routes/RepoViewer'
 import NotFound from './components/NotFound'
-import './index.css'
+import './index.scss'
 
 ReactDOM.render(
 	<React.StrictMode>

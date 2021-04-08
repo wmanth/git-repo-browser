@@ -2,7 +2,7 @@ import { Fragment, useContext, useEffect, useState } from 'react'
 import { GitTreeNode } from '../common/GitTree'
 import { FaFolder, FaFile } from 'react-icons/fa'
 import { RepoViewerContext } from '../routes/RepoViewer'
-import './FolderView.css'
+import './FolderView.scss'
 
 const COLLAPSED = 'collapsed'
 const COLLAPSE_DIRS = 'collapseDirs'

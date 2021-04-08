@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import './SplitView.css'
+import './SplitView.scss'
 
 interface SplitViewProps {
 	initialPrimaryExtend?: number

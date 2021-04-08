@@ -18,6 +18,7 @@
 		"@types/react-dom": "^17.0.1",
 		"@types/react-router-dom": "^5.1.7",
 		"@wmanth/git-repo-server": "^1.0.0",
+		"node-sass": "^5.0.0",
 		"react": "^17.0.1",
 		"react-dom": "^17.0.1",
 		"react-icons": "^4.2.0",

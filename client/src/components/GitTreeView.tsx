@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCaretDown, faCaretRight, faFolder, faFolderOpen, faFile, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { faGitSquare } from '@fortawesome/free-brands-svg-icons'
 import { RepoViewerContext } from "../routes/RepoViewer"
-import './GitTreeView.css'
+import './GitTreeView.scss'
 
 
 interface GitTreeViewContextType {

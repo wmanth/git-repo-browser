@@ -9,7 +9,7 @@ import FileNavigator from '../components/FileNavigator'
 import GitTreeView from '../components/GitTreeView'
 import ContentView from '../components/ContentView'
 import NotFound from '../components/NotFound'
-import './RepoViewer.css'
+import './RepoViewer.scss'
 
 export type SelectionHandler = (node: GitTreeNode) => void
 export type UpdateTreeHandler = (path: string) => Promise<void>

@@ -3,7 +3,7 @@ import { GitRef } from '../common/GitRepo'
 import { GitTree } from '../common/GitTree'
 import { GoGitBranch, GoTag } from 'react-icons/go'
 import Popover from './Popover'
-import './RefSelector.css'
+import './RefSelector.scss'
 
 interface RefSelectorProps {
 	gitTree?: GitTree
