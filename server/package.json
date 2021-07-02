@@ -24,7 +24,7 @@
     "tslog": "^3.1.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.9",
+    "@types/express": "^4.17.12",
     "@types/morgan": "^1.9.2",
     "@types/node-fetch": "^2.5.8",
     "@types/nodegit": "^0.26.12",

@@ -61,7 +61,7 @@ export default class NodegitAPI extends RepoAPI {
 				const tree = await entry.getTree()
 				return new Directory(tree.entries().map(gitTreeEntryToItem))
 			}
-			else if (entry.isSubmodule) {
+			else if (entry.isSubmodule()) {
 				return new Submodule(entry.sha())
 			}
 		}

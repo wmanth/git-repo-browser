@@ -47,6 +47,9 @@ function getRepoAPI(repoDesc: RepoInfo) {
 
 		case GitHubAPI.TYPE:
 			return new GitHubAPI(repoDesc as GitHubRepoInfo)
+
+		default:
+			return undefined
 	}
 }
 
@@ -63,7 +66,7 @@ function publishedInventory (inventory: any) {
 }
 
 // list all tags in the repository
-repos.get("/", (req, res, next) =>
+repos.get("/", (_, res, next) =>
 	readRepoInventory()
 	.then(inventory => res.json(publishedInventory(inventory)))
 	.catch(reason => next(reason))
@@ -79,7 +82,7 @@ repos.get("/:id", (req, res, next) =>
 repos.get("/:id/refs", (req, res, next) =>
 	findRepoDesc(req.params.id)
 	.then(repoDesc => getRepoAPI(repoDesc))
-	.then(repoAPI => repoAPI.fetchRefs())
+	.then(repoAPI => repoAPI?.fetchRefs())
 	.then(refs => res.json(refs))
 	.catch(reason => next(reason))
 )
@@ -88,9 +91,8 @@ repos.get("/:id/refs", (req, res, next) =>
 repos.get("/:id/refs/:ref", (req, res, next) =>
 	findRepoDesc(req.params.id)
 	.then(repoDesc => getRepoAPI(repoDesc))
-	.then(repoAPI => repoAPI.fetchRefs())
-	.then(refs => res.json(refs
-		.filter(ref => ref.startsWith(req.params.ref))
+	.then(repoAPI => repoAPI?.fetchRefs())
+	.then(refs => res.json(refs?.filter(ref => ref.startsWith(req.params.ref))
 		.map(ref => ref.slice(req.params.ref.length + 1))))
 	.catch(reason => next(reason))
 )
@@ -99,7 +101,7 @@ repos.get("/:id/refs/:ref", (req, res, next) =>
 repos.get("/:id/refs/*", async (req, res, next) => {
 	findRepoDesc(req.params.id)
 	.then(repoDesc => getRepoAPI(repoDesc))
-	.then(repoAPI => repoAPI.fetchTreeEntry(req.params[0]))
+	.then(repoAPI => repoAPI?.fetchTreeEntry((req.params as any)[0]))
 	.then(result => {
 		if (result instanceof Buffer) res.send(result)
 		else if (result instanceof Directory) res.json(result.getEntries())

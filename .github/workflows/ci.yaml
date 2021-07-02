@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ubuntu-node:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Setup Ubuntu build environment
+        run: sudo apt-get install libkrb5-dev
+      - name: Install node packages
+        run: npm ci
+      - name: Build Server
+        run: npm -C server run build
+      - name: Build Frontend
+        run: npm -C client run build
+  docker-image:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: make image
