@@ -1,4 +1,4 @@
-import { RepoInfo } from '../routes/repos.js'
+import { RepoInfo } from '@wmanth/git-repo-types'
 
 export enum TreeEntryType {
 	File = "file",

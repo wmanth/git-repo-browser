@@ -18,10 +18,12 @@ jobs:
         run: sudo apt-get install libkrb5-dev
       - name: Install node packages
         run: npm ci
+      - name: Build Shared
+        run: npm run --workspace=shared build
       - name: Build Server
-        run: npm -C server run build
+        run: npm run --workspace=server build
       - name: Build Frontend
-        run: npm -C client run build
+        run: npm run --workspace=client build
   docker-image:
     runs-on: ubuntu-20.04
     steps:

@@ -1,14 +1,7 @@
 import fetch, { Headers } from 'node-fetch'
 import { log } from '../globals.js'
-import { RepoInfo } from '../routes/repos.js'
+import { GitHubRepoInfo } from '@wmanth/git-repo-types'
 import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js'
-
-export interface GitHubRepoInfo extends RepoInfo {
-	owner: string
-	repo: string
-	base?: string
-	token?: string
-}
 
 function githubObjectToItem(content: any): TreeEntry {
 	return {
