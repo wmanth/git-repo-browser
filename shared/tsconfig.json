@@ -1,0 +1,27 @@
+{
+	"compilerOptions": {
+		"target":"ES2018",
+		"module": "commonjs",
+		"lib": ["es2020"],
+		"declaration": true,
+		"strict": true,
+		"noImplicitAny": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
+		"strictNullChecks": true,
+		"noImplicitThis": true,
+		"alwaysStrict": true,
+		"noUnusedLocals": false,
+		"noUnusedParameters": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": false,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strictPropertyInitialization":false,
+		"resolveJsonModule": true,
+		"outDir": "dist"
+	},
+	"include": [
+		"src/**/*"
+	]
+}

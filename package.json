@@ -4,7 +4,8 @@
 	"version": "1.0.0",
 	"workspaces": [
 		"./server",
-		"./client"
+		"./client",
+		"./shared"
 	],
 	"devDependencies": {
 		"@types/node": "^15.6.1",

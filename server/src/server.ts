@@ -12,7 +12,7 @@ const server = express()
 // server.use(morgan('tiny'))
 
 // host static react client resources
-server.use(express.static(path.resolve('dist', 'public')))
+server.use(express.static(path.resolve('public')))
 
 // define a route handle for the server configuration
 server.use('/config', config)
@@ -22,7 +22,7 @@ server.use('/api/repos', repos)
 
 // forward all other routes to the react client app
 server.get('*', (_, res) => {
-	res.sendFile(path.resolve('dist', 'public', 'index.html'));
+	res.sendFile(path.resolve('public', 'index.html'));
 })
 
 // start the server

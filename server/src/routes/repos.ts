@@ -4,20 +4,11 @@ import util from 'util'
 import express from 'express'
 import * as Global from '../globals.js'
 import { Directory, Submodule } from '../apis/api.js'
-import GitHubAPI, { GitHubRepoInfo } from '../apis/github.js'
-import NodegitAPI, { NodegitRepoInfo } from '../apis/nodegit.js'
+import GitHubAPI from '../apis/github.js'
+import NodegitAPI from '../apis/nodegit.js'
+import { RepoInfo, RepoInventory, GitHubRepoInfo, NodegitRepoInfo } from '@wmanth/git-repo-types'
 
 export const repos = express.Router()
-
-export interface RepoInfo {
-	name: string
-	type: string
-	url: string
-}
-
-export interface RepoInventory {
-	[id: string]: RepoInfo
-}
 
 // https://stackoverflow.com/questions/46867517
 const readFile = util.promisify(fs.readFile)
