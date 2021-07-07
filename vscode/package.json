@@ -1,0 +1,49 @@
+{
+	"name": "gitrepo-fs",
+	"displayName": "Git Repository Filesystem",
+	"description": "Provides a virtual file system based on the Git Repository Server API",
+	"version": "1.0.0",
+	"publisher": "wmanth",
+	"author": {
+		"name": "Wolfram Manthey"
+	},
+	"license" : "MIT",
+	"repository": {
+		"url": "https://github.com/wmanth/git-repo-browser.git"
+	},
+	"bugs": {
+		"url": "https://github.com/wmanth/git-repo-browser/issues"
+	},
+	"icon": "images/icon.png",
+	"engines": {
+		"vscode": "^1.56.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"git",
+        "filesystem"
+	],
+	"activationEvents": [
+		"onStartupFinished",
+		"onFileSystem:gitrepo"
+	],
+	"main": "./dist/extension.js",
+	"contributes": {
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run build",
+		"prebuild": "eslint src --ext ts",
+		"build": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run build",
+		"test": "node ./dist/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/vscode": "^1.56.0",
+		"vscode-test": "^1.5.0"
+	},
+	"dependencies": {
+	}
+}

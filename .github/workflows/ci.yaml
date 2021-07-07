@@ -24,6 +24,8 @@ jobs:
         run: npm run --workspace=server build
       - name: Build Frontend
         run: npm run --workspace=client build
+      - name: Build VS Code Extension
+        run: npm run --workspace=vscode build
   docker-image:
     runs-on: ubuntu-20.04
     steps:
