@@ -1,20 +1,20 @@
 export default class IndexPath {
-	private indexes: number[]
+	private indexes: number[];
 
-	static empty: IndexPath = new IndexPath([])
+	static empty: IndexPath = new IndexPath([]);
 
 	constructor(indexes: number[]) {
-		this.indexes = indexes.map(value => value)
+		this.indexes = indexes.map(value => value);
 	}
 
 	static fromString(str: string): IndexPath {
-		return new IndexPath(str.split('-').map(index => parseInt(index, 10)))
+		return new IndexPath(str.split('-').map(index => parseInt(index, 10)));
 	}
 
 	indexPathAppendingIndex(index: number) {
 		const indexes = this.indexes.map(value => value);
-		indexes.push(index)
-		return new IndexPath(indexes)
+		indexes.push(index);
+		return new IndexPath(indexes);
 	}
 
 	getIndexes(): number[] {
@@ -22,10 +22,10 @@ export default class IndexPath {
 	}
 
 	toString(): string {
-		return this.indexes.join('-')
+		return this.indexes.join('-');
 	}
 
 	isEmpty(): boolean {
-		return this.indexes.length === 0
+		return this.indexes.length === 0;
 	}
 }

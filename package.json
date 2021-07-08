@@ -7,12 +7,5 @@
 		"./client",
 		"./shared",
 		"./vscode"
-	],
-	"devDependencies": {
-		"@types/node": "^15.6.1",
-		"@typescript-eslint/eslint-plugin": "^4.14.1",
-		"@typescript-eslint/parser": "^4.14.1",
-		"eslint": "^7.30.0",
-		"typescript": "4.3.2"
-	}
+	]
 }

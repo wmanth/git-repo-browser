@@ -1,7 +1,7 @@
-import express from 'express'
+import express from 'express';
 
-export const config = express.Router()
+export const config = express.Router();
 
 config.get('/', (_, res) => {
-	res.json({title: "Repository Browser"})
-})
+	res.json({title: "Repository Browser"});
+});
