@@ -7,7 +7,7 @@
 	"author": {
 		"name": "Wolfram Manthey"
 	},
-	"license" : "MIT",
+	"license": "MIT",
 	"repository": {
 		"url": "https://github.com/wmanth/git-repo-browser.git"
 	},
@@ -23,14 +23,23 @@
 	],
 	"keywords": [
 		"git",
-        "filesystem"
+		"filesystem"
 	],
 	"activationEvents": [
-		"onStartupFinished",
+		"onView:repoSelect",
 		"onFileSystem:gitrepo"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"views": {
+			"explorer": [
+				{
+					"id": "repoSelect",
+					"name": "Select Repository",
+					"contextualTitle": "Repository Selection"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run build",
@@ -49,5 +58,6 @@
 		"vscode-test": "^1.5.0"
 	},
 	"dependencies": {
+		"node-fetch": "^2.6.1"
 	}
 }
