@@ -1,6 +1,6 @@
 import fetch, { Headers } from 'node-fetch';
 import { log } from '../globals.js';
-import { GitHubRepoInfo } from '@wmanth/git-repo-types';
+import { GitHubRepoInfo } from '@wmanth/git-repo-common';
 import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js';
 
 function githubObjectToItem(content: any): TreeEntry {

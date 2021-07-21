@@ -5,7 +5,7 @@ WORKDIR /builder
 
 # copy build sources into workdir
 ADD package*.json ./
-ADD shared ./shared/
+ADD common ./common/
 ADD server ./server/
 
 # install build environment and build nodegit
@@ -15,10 +15,10 @@ RUN apk update && \
     apk add python3 tzdata pkgconfig build-base
 
 # initialize the node environment
-RUN npm ci --workspace=shared --workspace=server
+RUN npm ci --workspace=common --workspace=server
 
 # build the server component
-RUN npm run build --workspace=shared --workspace=server
+RUN npm run build --workspace=common --workspace=server
 
 # remove obsolete resources to save space in the runtime image
 RUN npm prune --workspace=server --production
@@ -37,14 +37,14 @@ WORKDIR /builder
 
 # copy build sources into workdir
 ADD package*.json ./
-ADD shared ./shared/
+ADD common ./common/
 ADD client ./client/
 
 # initialize the node environment
-RUN npm ci --workspace=shared --workspace=client
+RUN npm ci --workspace=common --workspace=client
 
 # build the client component
-RUN npm run build --workspace=shared --workspace=client
+RUN npm run build --workspace=common --workspace=client
 
 # --------------------------------------------------------------------------- #
 

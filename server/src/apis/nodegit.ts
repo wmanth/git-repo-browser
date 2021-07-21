@@ -2,7 +2,7 @@ import { join } from 'path';
 import { REPO_HOME } from '../globals.js';
 import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api.js';
 import Git, { Reference } from 'nodegit';
-import { NodegitRepoInfo } from '@wmanth/git-repo-types';
+import { NodegitRepoInfo } from '@wmanth/git-repo-common';
 
 function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 	return {

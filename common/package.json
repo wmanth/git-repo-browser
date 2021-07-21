@@ -1,7 +1,8 @@
 {
-	"name": "@wmanth/git-repo-types",
+	"name": "@wmanth/git-repo-common",
 	"version": "1.0.0",
 	"private": true,
+	"main": "dist/types.js",
 	"types": "dist/types.d.ts",
 	"scripts": {
 		"build": "tsc"

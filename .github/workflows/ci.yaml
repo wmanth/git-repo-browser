@@ -18,8 +18,8 @@ jobs:
         run: sudo apt-get install libkrb5-dev
       - name: Install node packages
         run: npm ci
-      - name: Build Shared
-        run: npm run --workspace=shared build
+      - name: Build Common
+        run: npm run --workspace=common build
       - name: Build Server
         run: npm run --workspace=server build
       - name: Build Frontend

@@ -6,7 +6,7 @@ import * as Global from '../globals.js';
 import { ApiType, Directory, Submodule } from '../apis/api.js';
 import GitHubAPI from '../apis/github.js';
 import NodegitAPI from '../apis/nodegit.js';
-import { RepoInfo, RepoInventory, GitHubRepoInfo, NodegitRepoInfo } from '@wmanth/git-repo-types';
+import { RepoInfo, RepoInventory, GitHubRepoInfo, NodegitRepoInfo } from '@wmanth/git-repo-common';
 
 export const repos = express.Router();
 
