@@ -30,7 +30,7 @@
 		"@types/nodegit": "^0.26.12",
 		"@typescript-eslint/eslint-plugin": "^4.14.1",
 		"@typescript-eslint/parser": "^4.14.1",
-		"@wmanth/git-repo-types": "^1.0.0",
+		"@wmanth/git-repo-common": "^1.0.0",
 		"eslint": "^7.30.0",
 		"typescript": "4.3.2"
 	}

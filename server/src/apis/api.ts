@@ -1,4 +1,4 @@
-import { RepoInfo } from '@wmanth/git-repo-types';
+import { RepoInfo } from '@wmanth/git-repo-common';
 
 export enum ApiType {
 	eLocal = "local",
