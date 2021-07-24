@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
+import YAML from 'yaml';
 import express from 'express';
 import * as Global from '../globals.js';
 import { ApiType, Directory, Submodule } from '../apis/api.js';
@@ -14,12 +15,12 @@ export const repos = express.Router();
 const readFile = util.promisify(fs.readFile);
 
 async function readRepoInventory() {
-	const reposPath = path.join(Global.REPO_HOME, 'repos.json');
+	const reposPath = path.join(Global.REPO_HOME, 'repos.yaml');
 	const reposData = await readFile(reposPath, 'utf8');
 	if (!reposData) {
 		return Promise.reject(new Error(`Could not read ${reposPath}`));
 	}
-	return JSON.parse(reposData);
+	return YAML.parse(reposData);
 }
 
 async function findRepoDesc(id: string): Promise<RepoInfo> {
