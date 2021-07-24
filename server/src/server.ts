@@ -9,7 +9,7 @@ import { repos } from "./routes/repos.js";
 const server = express();
 
 // log HTTP requests
-// server.use(morgan('tiny'));
+server.use(morgan('tiny'));
 
 // host static react client resources
 server.use(express.static(path.resolve('public')));
