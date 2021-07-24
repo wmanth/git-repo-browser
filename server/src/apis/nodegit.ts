@@ -2,7 +2,7 @@ import { join } from 'path';
 import { REPO_HOME } from '../globals.js';
 import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api.js';
 import Git, { Reference } from 'nodegit';
-import { NodegitRepoInfo } from '@wmanth/git-repo-common';
+import { NodegitRepoConfig } from '@wmanth/git-repo-common';
 
 function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 	return {
@@ -15,21 +15,21 @@ function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 }
 
 export default class NodegitAPI extends RepoAPI {
-	private path: string;
+	private repoPath: string;
 
-	constructor(desc: NodegitRepoInfo) {
-		super(desc);
-		this.path = join(REPO_HOME, desc.local);
+	constructor(config: NodegitRepoConfig) {
+		super();
+		this.repoPath = join(REPO_HOME, config.local);
 	}
 
 	async fetchRefs() {
-		const repo = await Git.Repository.openBare(this.path);
+		const repo = await Git.Repository.openBare(this.repoPath);
 		const refs = await repo.getReferenceNames(Reference.TYPE.LISTALL);
 		return refs.map(ref => ref.slice('refs/'.length));
 	}
 
 	async fetchContent(refPath: string, resPath: string): Promise<Buffer | Directory | Submodule> {
-		const repo = await Git.Repository.openBare(this.path);
+		const repo = await Git.Repository.openBare(this.repoPath);
 
 		// fetch the referenced commit
 		// see https://github.com/nodegit/nodegit/issues/1370

@@ -1,21 +1,25 @@
-export interface RepoInfo {
-	name: string
-	type: string
-	url: string
+export enum RepoType {
+	local = 'local',
+	github = 'github'
 }
 
-export interface GitHubRepoInfo extends RepoInfo {
+export interface RepoInfo {
+	name: string
+	type: RepoType
+}
+
+export interface RepoInventory {
+	[id: string]: RepoInfo
+}
+
+export interface GitHubRepoConfig {
 	owner: string
 	repo: string
 	base?: string
 	token?: string
 }
 
-export interface NodegitRepoInfo extends RepoInfo {
+export interface NodegitRepoConfig {
 	local: string
 	remote: string
-}
-
-export interface RepoInventory {
-	[id: string]: RepoInfo
 }

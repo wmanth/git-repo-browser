@@ -60,8 +60,7 @@ export default function RepoSelector(props: RepoSelectorProps) {
 		return <li className={ className } onClick={ () => handleItemClick(itemProps.repoId) }>
 			<span className="repo-icon"><FontAwesomeIcon icon={ iconType } size="3x" /></span>
 			<span className="repo-desc">
-				<div className="repo-name">{ itemProps.repoInfo.name }</div>
-				<div className="repo-url">{ itemProps.repoInfo.url }</div>
+				<div>{ itemProps.repoInfo.name }</div>
 			</span>
 		</li>
 	}

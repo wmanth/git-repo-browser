@@ -1,6 +1,6 @@
 import fetch, { Headers } from 'node-fetch';
 import { log } from '../globals.js';
-import { GitHubRepoInfo } from '@wmanth/git-repo-common';
+import { GitHubRepoConfig } from '@wmanth/git-repo-common';
 import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js';
 
 function githubObjectToItem(content: any): TreeEntry {
@@ -18,12 +18,12 @@ export default class GitHubAPI extends RepoAPI {
 	private token?: string;
 	private baseUrl: string;
 
-	constructor(desc: GitHubRepoInfo) {
-		super(desc);
-		this.owner = desc.owner;
-		this.repo = desc.repo;
-		this.token = desc.token;
-		this.baseUrl = desc.base || 'https://api.github.com';
+	constructor(config: GitHubRepoConfig) {
+		super();
+		this.owner = config.owner;
+		this.repo = config.repo;
+		this.token = config.token;
+		this.baseUrl = config.base || 'https://api.github.com';
 	}
 
 	getHeaders() {
