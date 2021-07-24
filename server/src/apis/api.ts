@@ -1,10 +1,3 @@
-import { RepoInfo } from '@wmanth/git-repo-common';
-
-export enum ApiType {
-	eLocal = "local",
-	eGitHub = "github"
-}
-
 export enum TreeEntryType {
 	eFile = "file",
 	eDirectory = "directory",
@@ -28,8 +21,6 @@ export class Submodule {
 }
 
 export default abstract class RepoAPI {
-
-	constructor(readonly desc: RepoInfo) {}
 
 	abstract fetchRefs(): Promise<string[]>;
 	abstract fetchContent(ref: string, path: string): Promise<Buffer | Directory | Submodule>;
