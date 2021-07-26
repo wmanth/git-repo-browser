@@ -65,28 +65,44 @@ repos.get("/:id", (req, res, next) =>
 // list all refs in the repository
 repos.get("/:id/refs", (req, res, next) =>
 	getRepoAPI(req.params.id)
-	.then(repoAPI => repoAPI.fetchRefs())
+	.then(repo => repo.getRefs())
 	.then(refs => res.json(refs))
-	.catch(reason => next(reason))
-);
-
-// list all names of a specific ref type
-repos.get("/:id/refs/:ref", (req, res, next) =>
-	getRepoAPI(req.params.id)
-	.then(repoAPI => repoAPI.fetchRefs())
-	.then(refs => res.json(refs?.filter(ref => ref.startsWith(req.params.ref))
-		.map(ref => ref.slice(req.params.ref.length + 1))))
 	.catch(reason => next(reason))
 );
 
 // return the content of a file addressed by <ref-path>/<file-path>
 repos.get("/:id/refs/*", async (req, res, next) => {
-	getRepoAPI(req.params.id)
-	.then(repoAPI => repoAPI.fetchTreeEntry((req.params as any)[0]))
-	.then(result => {
-		if (result instanceof Buffer) { res.send(result); }
-		else if (result instanceof Directory) { res.json(result.getEntries()); }
-		else if (result instanceof Submodule) { res.json({ sha: result.getSha()}); }
-	})
-	.catch (reason => next(reason));
+	try {
+		const repo = await getRepoAPI(req.params.id);
+		const refs = await repo.getRefs();
+		var refPath: string = (req.params as any)[0];
+		refPath = refPath.endsWith('/') ? refPath.slice(0, -1) : refPath;
+
+		if (!refPath) {
+			res.json(refs);
+			return;
+		}
+
+		const [ref, path] = common.splitRefFilePath(refPath, refs);
+		if (ref) {
+			const content = await repo.getContent(ref, path);
+			if (content instanceof Buffer) {
+				res.send(content);
+			}
+			else if (content instanceof Directory) {
+				res.json(content.getEntries());
+			}
+			else if (content instanceof Submodule) {
+				res.json({ sha: content.getSha()});
+			}
+		}
+		else {
+			const matches = common.findRef(refPath, refs);
+			res.json(matches);
+		}
+	}
+	catch (reason) {
+		next(reason);
+	}
 });
+

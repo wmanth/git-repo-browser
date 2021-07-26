@@ -1,3 +1,5 @@
+export * from './utils';
+
 export enum RepoType {
 	local = 'local',
 	github = 'github'
