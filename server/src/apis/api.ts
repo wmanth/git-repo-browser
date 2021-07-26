@@ -20,27 +20,7 @@ export class Submodule {
 	getSha(): string { return this.sha; }
 }
 
-export default abstract class RepoAPI {
-
-	abstract fetchRefs(): Promise<string[]>;
-	abstract fetchContent(ref: string, path: string): Promise<Buffer | Directory | Submodule>;
-
-	async fetchTreeEntry(path: string): Promise<Buffer|Directory|Submodule> {
-		const refs = await this.fetchRefs();
-
-		// split the wildcard path into a ref-path and file-path
-		const refPathElements: string[] = [];
-		const filePathElements = path.split('/');
-		let refPath = "";
-		let filePath = filePathElements.join('/');
-		while (true) {
-			const nextPathElement = filePathElements.shift();
-			if (!nextPathElement) { break; }
-			refPathElements.push(nextPathElement);
-			refPath = refPathElements.join('/');
-			filePath = filePathElements.join('/');
-			if (refs.includes(refPath)) { break; }
-		}
-		return this.fetchContent(refPath, filePath);
-	}
+export default interface RepoAPI {
+	getRefs(): Promise<string[]>;
+	getContent(ref: string, path: string): Promise<Buffer | Directory | Submodule>;
 }

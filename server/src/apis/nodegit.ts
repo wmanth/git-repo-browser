@@ -14,21 +14,20 @@ function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 	};
 }
 
-export default class NodegitAPI extends RepoAPI {
+export default class NodegitAPI implements RepoAPI {
 	private repoPath: string;
 
 	constructor(config: NodegitRepoConfig) {
-		super();
 		this.repoPath = join(REPO_HOME, config.local);
 	}
 
-	async fetchRefs() {
+	async getRefs() {
 		const repo = await Git.Repository.openBare(this.repoPath);
 		const refs = await repo.getReferenceNames(Reference.TYPE.LISTALL);
 		return refs.map(ref => ref.slice('refs/'.length));
 	}
 
-	async fetchContent(refPath: string, resPath: string): Promise<Buffer | Directory | Submodule> {
+	async getContent(refPath: string, resPath: string): Promise<Buffer | Directory | Submodule> {
 		const repo = await Git.Repository.openBare(this.repoPath);
 
 		// fetch the referenced commit
