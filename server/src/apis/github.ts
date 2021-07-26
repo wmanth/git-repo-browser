@@ -12,14 +12,13 @@ function githubObjectToItem(content: any): TreeEntry {
 	};
 }
 
-export default class GitHubAPI extends RepoAPI {
+export default class GitHubAPI implements RepoAPI {
 	private owner: string;
 	private repo: string;
 	private token?: string;
 	private baseUrl: string;
 
 	constructor(config: GitHubRepoConfig) {
-		super();
 		this.owner = config.owner;
 		this.repo = config.repo;
 		this.token = config.token;
@@ -34,7 +33,7 @@ export default class GitHubAPI extends RepoAPI {
 		return headers;
 	}
 
-	async fetchRefs(): Promise<string[]> {
+	async getRefs(): Promise<string[]> {
 		const url = `${this.baseUrl}/repos/${this.owner}/${this.repo}/git/matching-refs/`;
 		log.info(`Fetching ${url}`);
 
@@ -49,7 +48,7 @@ export default class GitHubAPI extends RepoAPI {
 		return refList.map((refItem: { [key: string]: string | any }) => refItem.ref.slice('refs/'.length));
 	}
 
-	async fetchContent(ref: string, path: string) {
+	async getContent(ref: string, path: string) {
 		const url = `${this.baseUrl}/repos/${this.owner}/${this.repo}/contents/${path}?ref=${ref}`;
 		log.info(`Fetching ${url}`);
 
