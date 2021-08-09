@@ -1,7 +1,7 @@
 import express from 'express';
 
-export const config = express.Router();
+export const admin = express.Router();
 
-config.get('/', (_, res) => {
+admin.get('/', (_, res) => {
 	res.json({title: "Repository Browser"});
 });

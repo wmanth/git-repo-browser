@@ -1,5 +1,5 @@
 import fetch, { Headers } from 'node-fetch';
-import { log } from '../globals.js';
+import log from '../log';
 import { GitHubRepoConfig } from '@wmanth/git-repo-common';
 import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js';
 

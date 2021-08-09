@@ -1,6 +1,5 @@
 import { join } from 'path';
-import { REPO_HOME } from '../globals.js';
-import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api.js';
+import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api';
 import Git, { Reference } from 'nodegit';
 import { NodegitRepoConfig } from '@wmanth/git-repo-common';
 
@@ -17,8 +16,8 @@ function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 export default class NodegitAPI implements RepoAPI {
 	private repoPath: string;
 
-	constructor(config: NodegitRepoConfig) {
-		this.repoPath = join(REPO_HOME, config.local);
+	constructor(repoHome: string, repoConfig: NodegitRepoConfig) {
+		this.repoPath = join(repoHome, repoConfig.local);
 	}
 
 	async getRefs() {
