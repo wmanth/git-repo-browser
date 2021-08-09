@@ -1,31 +1,47 @@
 import express from "express";
 import morgan from "morgan";
 import path from "path";
-import * as Global from "./globals.js";
-import { config } from "./routes/config.js";
-import { repos } from "./routes/repos.js";
+import log from "./log";
+import Config from "./classes/Config";
+import { admin } from "./routes/admin";
+import { repos } from "./routes/repos";
 
-// tslint:disable:no-console
-const server = express();
+class ServerLogger implements morgan.StreamOptions {
+	write(str: string): void { log.info(str); }
+}
 
-// log HTTP requests
-server.use(morgan('tiny'));
+export default class Server {
 
-// host static react client resources
-server.use(express.static(path.resolve('public')));
+	readonly server = express();
 
-// define a route handle for the server configuration
-server.use('/config', config);
+	private logger = new ServerLogger();
 
-// define a route handler for the repository inspection routines
-server.use('/api/repos', repos);
+	constructor(config: Config) {
+		this.server.locals.config = config;
 
-// forward all other routes to the react client app
-server.get('*', (_, res) => {
-	res.sendFile(path.resolve('public', 'index.html'));
-});
+		// log HTTP requests
+		this.server.use(morgan('tiny', { stream: this.logger }));
 
-// start the server
-server.listen( Global.PORT, () => {
-	console.log(`listening on port ${Global.PORT}`);
-});
+		// host static react client resources
+		this.server.use(express.static(path.resolve('public')));
+
+		// define a route handle for the server configuration
+		this.server.use('/admin', admin);
+
+		// define a route handler for the repository inspection routines
+		this.server.use('/api/repos', repos);
+
+		// forward all other routes to the react client app
+		this.server.get('*', (_, res) => {
+			res.sendFile(path.resolve('public', 'index.html'));
+		});
+	}
+
+	// start the server
+	listen() {
+		const port = process.env.PORT || 8080;
+		this.server.listen( port, () => {
+			log.info(`listening on port ${port}`);
+		});
+	}
+}
