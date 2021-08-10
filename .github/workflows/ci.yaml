@@ -22,8 +22,10 @@ jobs:
         run: |
           npm --workspace common run build
           npm --workspace common run test
-      - name: Build Server
-        run: npm --workspace server run build
+      - name: Build and Test Server
+        run: |
+          npm --workspace server run build
+          npm --workspace server run test
       - name: Build Frontend
         run: npm --workspace client run build
       - name: Build VS Code Extension

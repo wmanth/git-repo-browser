@@ -12,27 +12,29 @@ class ServerLogger implements morgan.StreamOptions {
 
 export default class Server {
 
-	readonly server = express();
+	readonly app = express();
 
 	private logger = new ServerLogger();
 
 	constructor(config: Config) {
-		this.server.locals.config = config;
+		this.app.locals.config = config;
 
 		// log HTTP requests
-		this.server.use(morgan('tiny', { stream: this.logger }));
+		if (this.app.get('env') === 'development') {
+			this.app.use(morgan('tiny', { stream: this.logger }));
+		}
 
 		// host static react client resources
-		this.server.use(express.static(path.resolve('public')));
+		this.app.use(express.static(path.resolve('public')));
 
 		// define a route handle for the server configuration
-		this.server.use('/admin', admin);
+		this.app.use('/admin', admin);
 
 		// define a route handler for the repository inspection routines
-		this.server.use('/api/repos', repos);
+		this.app.use('/api/repos', repos);
 
 		// forward all other routes to the react client app
-		this.server.get('*', (_, res) => {
+		this.app.get('*', (_, res) => {
 			res.sendFile(path.resolve('public', 'index.html'));
 		});
 	}
@@ -40,7 +42,7 @@ export default class Server {
 	// start the server
 	listen() {
 		const port = process.env.PORT || 8080;
-		this.server.listen( port, () => {
+		this.app.listen( port, () => {
 			log.info(`listening on port ${port}`);
 		});
 	}
