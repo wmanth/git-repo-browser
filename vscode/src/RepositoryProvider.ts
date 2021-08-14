@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
+import * as common from '@wmanth/git-repo-common';
 import fetch from 'node-fetch';
+import OpenRefCommand from './OpenRefCommand';
 
 interface Node {
 	label: string
@@ -23,17 +25,13 @@ class Repository implements Node {
 	}
 }
 
-enum ReferenceType {
-	branch, tags
-}
-
 class ReferenceGroup implements Node {
 	readonly uri: vscode.Uri;
 	readonly label: string;
-	constructor(readonly refType: ReferenceType, readonly parent: Repository) {
-		this.label = (refType === ReferenceType.branch) ? 'branches' : 'tags';
-		const refsName = (refType === ReferenceType.branch) ? 'heads' : 'tags';
-		this.uri = vscode.Uri.joinPath(parent.uri, `refs/${refsName}`);
+
+	constructor(readonly refType: common.RefType, readonly parent: Repository) {
+		this.label = (refType === common.RefType.heads) ? 'branches' : 'tags';
+		this.uri = vscode.Uri.joinPath(parent.uri, `refs/${refType}`);
 	}
 
 	getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -52,9 +50,10 @@ class Reference implements Node {
 
 	getTreeItem(): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		const treeItem = new vscode.TreeItem(this.label, vscode.TreeItemCollapsibleState.None);
-		treeItem.iconPath = (this.parent.refType === ReferenceType.branch) ? 
+		treeItem.iconPath = (this.parent.refType === common.RefType.heads) ?
 			new vscode.ThemeIcon('git-branch') :
 			new vscode.ThemeIcon('tag');
+		treeItem.command = new OpenRefCommand(`${this.parent.parent.label}: ${this.label}`, this.uri);
 		return treeItem;
 	}
 }
@@ -81,11 +80,11 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 				.then(inventory => Object.keys(inventory)
 					.map(id =>  new Repository(id, inventory[id].name, vscode.Uri.joinPath(uri, id))))
 				.catch(e => undefined );
-		
+
 		}
 
 		if (element instanceof Repository) {
-			return [ReferenceType.branch, ReferenceType.tags]
+			return [common.RefType.heads, common.RefType.tags]
 				.map(refType => new ReferenceGroup(refType, element));
 		}
 
@@ -99,5 +98,4 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 
 		return undefined;
 	}
-
 }
