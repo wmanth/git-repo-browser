@@ -1,22 +1,22 @@
 import { join } from 'path';
-import RepoAPI, { Directory, TreeEntry, TreeEntryType, Submodule } from './api';
+import RepoAPI, { Directory, TreeEntry, Submodule } from './api';
 import Git, { Reference } from 'nodegit';
-import { NodegitRepoConfig } from '@wmanth/git-repo-common';
+import * as common from '@wmanth/git-repo-common';
 
 function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
 	return {
 		name: entry.name(),
 		path: entry.path(),
-		type: entry.isSubmodule() ? TreeEntryType.eSubmodule
-			: entry.isDirectory() ? TreeEntryType.eDirectory
-			: TreeEntryType.eFile
+		type: entry.isSubmodule() ? common.GitObjectType.submodule
+			: entry.isDirectory() ? common.GitObjectType.directory
+			: common.GitObjectType.file
 	};
 }
 
 export default class NodegitAPI implements RepoAPI {
 	private repoPath: string;
 
-	constructor(repoHome: string, repoConfig: NodegitRepoConfig) {
+	constructor(repoHome: string, repoConfig: common.NodegitRepoConfig) {
 		this.repoPath = join(repoHome, repoConfig.local);
 	}
 

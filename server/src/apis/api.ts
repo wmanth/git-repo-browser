@@ -1,13 +1,9 @@
-export enum TreeEntryType {
-	eFile = "file",
-	eDirectory = "directory",
-	eSubmodule = "submodule"
-}
+import * as common from '@wmanth/git-repo-common';
 
 export interface TreeEntry {
 	name: string
 	path: string
-	type: TreeEntryType
+	type: common.GitObjectType
 }
 
 export class Directory {
