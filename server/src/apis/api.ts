@@ -1,13 +1,7 @@
 import * as common from '@wmanth/git-repo-common';
 
-export interface TreeEntry {
-	name: string
-	path: string
-	type: common.GitObjectType
-}
-
 export class Directory {
-	constructor(private entries: TreeEntry[]) {}
+	constructor(private entries: common.GitTreeEntry[]) {}
 	getEntries() { return this.entries; }
 }
 

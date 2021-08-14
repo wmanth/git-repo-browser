@@ -1,9 +1,9 @@
 import fetch, { Headers } from 'node-fetch';
 import log from '../log';
 import * as common from '@wmanth/git-repo-common';
-import RepoAPI, { Directory, Submodule, TreeEntry } from './api.js';
+import RepoAPI, { Directory, Submodule } from './api.js';
 
-function githubObjectToItem(content: any): TreeEntry {
+function githubObjectToItem(content: any): common.GitTreeEntry {
 	return {
 		name: content.name,
 		path: content.path,
