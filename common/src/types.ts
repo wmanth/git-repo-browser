@@ -18,6 +18,12 @@ export enum GitObjectType {
 	submodule = 'submodule'
 }
 
+export interface GitTreeEntry {
+	name: string
+	path: string
+	type: GitObjectType
+}
+
 export interface RepoInfo {
 	name: string
 	type: RepoType
