@@ -1,5 +1,7 @@
 export * from './utils';
 
+export const GIT_OBJECT_TYPE_HEADER = 'Git-Object-Type';
+
 export enum RepoType {
 	local = 'local',
 	github = 'github'
@@ -8,6 +10,12 @@ export enum RepoType {
 export enum RefType {
 	heads = 'heads',
 	tags = 'tags'
+}
+
+export enum GitObjectType {
+	file = 'file',
+	directory = 'directory',
+	submodule = 'submodule'
 }
 
 export interface RepoInfo {
