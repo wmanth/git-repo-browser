@@ -27,7 +27,7 @@
 	],
 	"activationEvents": [
 		"onView:repoSelect",
-		"onFileSystem:gitrepo"
+		"onFileSystem:repofs"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {

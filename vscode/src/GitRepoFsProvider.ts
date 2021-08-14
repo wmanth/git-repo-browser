@@ -1,11 +1,14 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
+import fetch from 'node-fetch';
 
 export default class GitRepoFsProvider implements vscode.FileSystemProvider {
+
+	static scheme = 'repofs';
 
 	public static register(context: vscode.ExtensionContext): vscode.Disposable {
 		const provider = new GitRepoFsProvider(context);
 		const options = { isCaseSensitive: true, isReadonly: true };
-		const providerRegistration = vscode.workspace.registerFileSystemProvider('gitrepo', provider, options);
+		const providerRegistration = vscode.workspace.registerFileSystemProvider(GitRepoFsProvider.scheme, provider, options);
 		return providerRegistration;
 	}
 
@@ -14,7 +17,7 @@ export default class GitRepoFsProvider implements vscode.FileSystemProvider {
 	constructor(
 		private readonly context: vscode.ExtensionContext
 	) {
-		this.outChannel = vscode.window.createOutputChannel("GitSrv");
+		this.outChannel = vscode.window.createOutputChannel("RepoFS");
 		this.outChannel.show();
 	}
 
@@ -26,9 +29,13 @@ export default class GitRepoFsProvider implements vscode.FileSystemProvider {
 		return new vscode.Disposable(() => { });
 	}
 
-	stat(uri: vscode.Uri): vscode.FileStat | Promise<vscode.FileStat> {
-		this.outChannel.appendLine(`${uri.toString()} not found`);
-		console.log(`${uri.toString()} not found`);
+	async stat(uri: vscode.Uri): Promise<vscode.FileStat> {
+		this.outChannel.appendLine(`stat for ${uri.toString()}`);
+		const repoUri = uri.with({ scheme: "http" });
+		const response = await fetch(repoUri.toString());
+		if (!response.ok) {
+			throw vscode.FileSystemError.FileNotFound(uri);
+		}
 		throw vscode.FileSystemError.FileNotFound(uri);
 	}
 

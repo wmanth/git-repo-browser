@@ -5,6 +5,11 @@ export enum RepoType {
 	github = 'github'
 }
 
+export enum RefType {
+	heads = 'heads',
+	tags = 'tags'
+}
+
 export interface RepoInfo {
 	name: string
 	type: RepoType
