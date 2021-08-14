@@ -44,13 +44,16 @@ repos.get("/:id/refs/*", async (req, res, next) => {
 		if (ref) {
 			const content = await repo.getContent(ref, path);
 			if (content instanceof Buffer) {
+				res.set(common.GIT_OBJECT_TYPE_HEADER, common.GitObjectType.file);
 				res.send(content);
 			}
 			else if (content instanceof Directory) {
+				res.set(common.GIT_OBJECT_TYPE_HEADER, common.GitObjectType.directory);
 				res.json(content.getEntries());
 			}
 			else if (content instanceof Submodule) {
-				res.json({ sha: content.getSha()});
+				res.set(common.GIT_OBJECT_TYPE_HEADER, common.GitObjectType.submodule);
+				res.json({ sha: content.getSha() });
 			}
 		}
 		else {

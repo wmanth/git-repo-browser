@@ -1,14 +1,13 @@
 import fetch, { Headers } from 'node-fetch';
 import log from '../log';
-import { GitHubRepoConfig } from '@wmanth/git-repo-common';
-import RepoAPI, { Directory, Submodule, TreeEntry, TreeEntryType } from './api.js';
+import * as common from '@wmanth/git-repo-common';
+import RepoAPI, { Directory, Submodule, TreeEntry } from './api.js';
 
 function githubObjectToItem(content: any): TreeEntry {
 	return {
 		name: content.name,
 		path: content.path,
-		type: content.type === 'dir' ? TreeEntryType.eDirectory
-			: TreeEntryType.eFile
+		type: content.type === 'dir' ? common.GitObjectType.directory : common.GitObjectType.file
 	};
 }
 
@@ -18,7 +17,7 @@ export default class GitHubAPI implements RepoAPI {
 	private token?: string;
 	private baseUrl: string;
 
-	constructor(config: GitHubRepoConfig) {
+	constructor(config: common.GitHubRepoConfig) {
 		this.owner = config.owner;
 		this.repo = config.repo;
 		this.token = config.token;
