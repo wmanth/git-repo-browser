@@ -1,9 +1,9 @@
 import { join } from 'path';
-import RepoAPI, { Directory, TreeEntry, Submodule } from './api';
+import RepoAPI, { Directory, Submodule } from './api';
 import Git, { Reference } from 'nodegit';
 import * as common from '@wmanth/git-repo-common';
 
-function gitTreeEntryToItem(entry: Git.TreeEntry): TreeEntry {
+function gitTreeEntryToItem(entry: Git.TreeEntry): common.GitTreeEntry {
 	return {
 		name: entry.name(),
 		path: entry.path(),
