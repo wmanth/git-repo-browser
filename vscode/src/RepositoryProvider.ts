@@ -3,6 +3,9 @@ import * as common from '@wmanth/git-repo-common';
 import fetch from 'node-fetch';
 import OpenRefCommand from './OpenRefCommand';
 
+const HOSTNAME_CONFIG = 'repofs.gateway.hostName';
+const PORT_CONFIG = 'repofs.gateway.portNumber';
+
 interface Node {
 	label: string
 	uri: vscode.Uri
@@ -62,7 +65,15 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 
 	private baseUri: vscode.Uri;
 
-	constructor(hostName: string, port: number) {
+	static register(): vscode.Disposable {
+		const repositoryProvider = new RepositoryProvider();
+		return vscode.window.registerTreeDataProvider('repoSelect', repositoryProvider);
+	}
+
+	private constructor() {
+		const config = vscode.workspace.getConfiguration();
+		const hostName = config.get(HOSTNAME_CONFIG);
+		const port = config.get(PORT_CONFIG);
 		this.baseUri = vscode.Uri.parse(`http://${hostName}:${port}/api`);
 	}
 
