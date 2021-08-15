@@ -1,5 +1,5 @@
 {
-	"name": "gitrepo-fs",
+	"name": "git-repofs",
 	"displayName": "Git Repository Filesystem",
 	"description": "Provides a virtual file system based on the Git Repository Server API",
 	"version": "1.0.0",
@@ -31,6 +31,21 @@
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "GitRepoFS",
+			"properties": {
+				"repofs.gateway.hostName": {
+					"type": "string",
+					"default": "localhost",
+					"description": "Host name of the Git repository gateway"
+				},
+				"repofs.gateway.portNumber": {
+					"type": "number",
+					"default": 8080,
+					"description": "Port number of the Git repository gateway"
+				}
+			}
+		},
 		"views": {
 			"explorer": [
 				{
