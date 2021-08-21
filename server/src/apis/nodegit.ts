@@ -1,7 +1,7 @@
 import { join } from 'path';
 import RepoAPI, { Directory, Submodule } from './api';
 import Git, { Reference } from 'nodegit';
-import * as common from '@wmanth/git-repo-common';
+import * as common from '@repofs/common';
 
 function gitTreeEntryToItem(entry: Git.TreeEntry): common.GitTreeEntry {
 	return {

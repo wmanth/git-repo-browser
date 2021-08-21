@@ -1,4 +1,4 @@
-import { RepoInfo } from '@wmanth/git-repo-common'
+import { RepoInfo } from '@repofs/common'
 
 export enum GitTreeEntryType {
 	File = 'file',

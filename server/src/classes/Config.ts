@@ -3,7 +3,7 @@ import path from 'path';
 import util from 'util';
 import YAML from 'yaml';
 import RepoAPI from '../apis/api';
-import * as common from '@wmanth/git-repo-common';
+import * as common from '@repofs/common';
 import GitHubAPI from '../apis/github';
 import NodegitAPI from '../apis/nodegit';
 

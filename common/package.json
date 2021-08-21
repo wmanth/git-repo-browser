@@ -1,5 +1,5 @@
 {
-	"name": "@wmanth/git-repo-common",
+	"name": "@repofs/common",
 	"version": "1.0.0",
 	"private": true,
 	"main": "dist/types.js",

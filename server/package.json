@@ -1,5 +1,5 @@
 {
-	"name": "@wmanth/git-repo-server",
+	"name": "@repofs/server",
 	"version": "1.0.0",
 	"private": true,
 	"description": "",
@@ -33,7 +33,7 @@
 		"@types/nodegit": "^0.26.12",
 		"@typescript-eslint/eslint-plugin": "^4.14.1",
 		"@typescript-eslint/parser": "^4.14.1",
-		"@wmanth/git-repo-common": "^1.0.0",
+		"@repofs/common": "^1.0.0",
 		"chai": "^4.3.4",
 		"chai-http": "^4.3.0",
 		"eslint": "^7.30.0",

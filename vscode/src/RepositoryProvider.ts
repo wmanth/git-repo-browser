@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as common from '@wmanth/git-repo-common';
+import * as common from '@repofs/common';
 import fetch from 'node-fetch';
 import OpenRefCommand from './OpenRefCommand';
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import * as common from '@wmanth/git-repo-common';
+import * as common from '@repofs/common';
 import { Directory, Submodule } from '../apis/api';
 import Config from '../classes/Config';
 
