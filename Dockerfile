@@ -61,8 +61,8 @@ WORKDIR /server
 COPY --from=server-builder /builder/node_modules.tgz /tmp/
 RUN tar xzf /tmp/node_modules.tgz && rm /tmp/node_modules.tgz
 
-COPY --from=server-builder /builder/wmanth-git-repo-server-1.0.0.tgz /tmp/
-RUN tar xzf /tmp/wmanth-git-repo-server-1.0.0.tgz && rm /tmp/wmanth-git-repo-server-1.0.0.tgz
+COPY --from=server-builder /builder/repofs-server-1.0.0.tgz /tmp/
+RUN tar xzf /tmp/repofs-server-1.0.0.tgz && rm /tmp/repofs-server-1.0.0.tgz
 
 # copy server resources from the client builder image
 COPY --from=client-builder /builder/client/build ./public/

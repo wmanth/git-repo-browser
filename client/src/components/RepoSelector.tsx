@@ -1,6 +1,6 @@
 import { Fragment, MouseEvent, useState } from 'react'
 import GitRepo from '../common/GitRepo'
-import { RepoInfo, RepoInventory } from '@wmanth/git-repo-common'
+import { RepoInfo, RepoInventory } from '@repofs/common'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGitSquare, faGithubSquare } from '@fortawesome/free-brands-svg-icons'
 import { GitTree } from '../common/GitTree'

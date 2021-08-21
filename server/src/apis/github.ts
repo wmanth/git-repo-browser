@@ -1,6 +1,6 @@
 import fetch, { Headers } from 'node-fetch';
 import log from '../log';
-import * as common from '@wmanth/git-repo-common';
+import * as common from '@repofs/common';
 import RepoAPI, { Directory, Submodule } from './api.js';
 
 function githubObjectToItem(content: any): common.GitTreeEntry {

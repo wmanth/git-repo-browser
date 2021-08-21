@@ -1,4 +1,4 @@
-import * as common from '@wmanth/git-repo-common';
+import * as common from '@repofs/common';
 
 export class Directory {
 	constructor(private entries: common.GitTreeEntry[]) {}
