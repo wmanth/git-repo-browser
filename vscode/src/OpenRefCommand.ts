@@ -9,14 +9,16 @@ export default class OpenRefCommand implements vscode.Command {
 	readonly tooltip = undefined;
 	readonly arguments: string[] = [];
 
-	static register(): vscode.Disposable {
+	static register(context: vscode.ExtensionContext): void {
 		const commandHandler = (name: string, repoUri: string) => {
 			const uri = vscode.Uri
 				.parse(repoUri)
 				.with({ scheme: GitRepoFsProvider.scheme });
 			vscode.workspace.updateWorkspaceFolders(0, 0, { uri, name });
 		};
-		return vscode.commands.registerCommand(OpenRefCommand.command, commandHandler);
+		context.subscriptions.push(
+			vscode.commands.registerCommand(OpenRefCommand.command, commandHandler)
+		);
 	}
 
 	constructor(name: string, uri: vscode.Uri) {
