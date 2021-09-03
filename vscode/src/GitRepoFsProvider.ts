@@ -6,11 +6,12 @@ export default class GitRepoFsProvider implements vscode.FileSystemProvider {
 
 	static scheme = 'repofs';
 
-	public static register(): vscode.Disposable {
+	public static register(context: vscode.ExtensionContext): void {
 		const provider = new GitRepoFsProvider();
 		const options = { isCaseSensitive: true, isReadonly: true };
-		const providerRegistration = vscode.workspace.registerFileSystemProvider(GitRepoFsProvider.scheme, provider, options);
-		return providerRegistration;
+		context.subscriptions.push(
+			vscode.workspace.registerFileSystemProvider(GitRepoFsProvider.scheme, provider, options)
+		);
 	}
 
 	private outChannel: vscode.OutputChannel;
