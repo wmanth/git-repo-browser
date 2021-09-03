@@ -46,12 +46,28 @@
 				}
 			}
 		},
+		"commands": [
+			{
+				"command": "repoList.refresh",
+				"title": "Refresh Repository List",
+				"icon": "$(extensions-refresh)"
+			}
+		],
 		"views": {
 			"explorer": [
 				{
 					"id": "repoList",
 					"name": "Repositories",
 					"contextualTitle": "Repository List"
+				}
+			]
+		},
+		"menus": {
+			"view/title": [
+				{
+					"command": "repoList.refresh",
+					"when": "view == repoList",
+					"group": "navigation"
 				}
 			]
 		}

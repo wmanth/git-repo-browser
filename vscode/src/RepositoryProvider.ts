@@ -70,6 +70,9 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 		context.subscriptions.push(
 			vscode.window.registerTreeDataProvider('repoList', repositoryProvider)
 		);
+		context.subscriptions.push(
+			vscode.commands.registerCommand('repoList.refresh', () => repositoryProvider.refresh())
+		);
 	}
 
 	private constructor() {
@@ -79,7 +82,9 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 		this.baseUri = vscode.Uri.parse(`http://${hostName}:${port}/api`);
 	}
 
-	onDidChangeTreeData?: vscode.Event<void | Node | null | undefined> | undefined;
+	private changeTreeDataEmitter: vscode.EventEmitter<Node | undefined | null | void> = new vscode.EventEmitter<Node | undefined | null | void>();
+
+	readonly onDidChangeTreeData: vscode.Event<Node | undefined | null | void> = this.changeTreeDataEmitter.event;
 
 	getTreeItem(element: Node): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		return element.getTreeItem();
@@ -110,5 +115,9 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 		}
 
 		return undefined;
+	}
+
+	refresh(): void {
+		this.changeTreeDataEmitter.fire();
 	}
 }
