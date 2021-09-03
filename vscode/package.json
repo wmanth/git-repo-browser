@@ -2,7 +2,7 @@
 	"name": "git-repofs",
 	"displayName": "Git Repository Filesystem",
 	"description": "Provides a virtual file system based on the Git Repository Server API",
-	"version": "1.0.0-alpha-1",
+	"version": "1.0.0-alpha-2",
 	"publisher": "wmanth",
 	"author": {
 		"name": "Wolfram Manthey"
