@@ -26,7 +26,7 @@
 		"filesystem"
 	],
 	"activationEvents": [
-		"onView:repoSelect",
+		"onView:repoList",
 		"onFileSystem:repofs"
 	],
 	"main": "./dist/main.js",
@@ -49,9 +49,9 @@
 		"views": {
 			"explorer": [
 				{
-					"id": "repoSelect",
-					"name": "Select Repository",
-					"contextualTitle": "Repository Selection"
+					"id": "repoList",
+					"name": "Repositories",
+					"contextualTitle": "Repository List"
 				}
 			]
 		}
