@@ -68,7 +68,7 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 	static register(context: vscode.ExtensionContext): void {
 		const repositoryProvider = new RepositoryProvider();
 		context.subscriptions.push(
-			vscode.window.registerTreeDataProvider('repoSelect', repositoryProvider)
+			vscode.window.registerTreeDataProvider('repoList', repositoryProvider)
 		);
 	}
 
