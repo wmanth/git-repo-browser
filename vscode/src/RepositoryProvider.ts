@@ -3,9 +3,6 @@ import * as common from '@repofs/common';
 import fetch from 'node-fetch';
 import OpenRefCommand from './OpenRefCommand';
 
-const HOSTNAME_CONFIG = 'repofs.gateway.hostName';
-const PORT_CONFIG = 'repofs.gateway.portNumber';
-
 interface Node {
 	label: string
 	uri: vscode.Uri
@@ -61,9 +58,9 @@ class Reference implements Node {
 	}
 }
 
-export default class RepositoryProvider implements vscode.TreeDataProvider<Node> {
+type NodeEvent = Node | undefined | null | void;
 
-	private baseUri: vscode.Uri;
+export default class RepositoryProvider implements vscode.TreeDataProvider<Node> {
 
 	static register(context: vscode.ExtensionContext): void {
 		const repositoryProvider = new RepositoryProvider();
@@ -75,16 +72,16 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 		);
 	}
 
-	private constructor() {
-		const config = vscode.workspace.getConfiguration();
-		const hostName = config.get(HOSTNAME_CONFIG);
-		const port = config.get(PORT_CONFIG);
-		this.baseUri = vscode.Uri.parse(`http://${hostName}:${port}/api`);
+	private getBaseUri(): vscode.Uri {
+		const repoGatewayConf = vscode.workspace.getConfiguration('repofs.gateway');
+		const hostName = repoGatewayConf.get('hostName');
+		const port = repoGatewayConf.get('portNumber');
+		return vscode.Uri.parse(`http://${hostName}:${port}/api`);
 	}
 
-	private changeTreeDataEmitter: vscode.EventEmitter<Node | undefined | null | void> = new vscode.EventEmitter<Node | undefined | null | void>();
+	private changeTreeDataEmitter: vscode.EventEmitter<NodeEvent> = new vscode.EventEmitter<NodeEvent>();
 
-	readonly onDidChangeTreeData: vscode.Event<Node | undefined | null | void> = this.changeTreeDataEmitter.event;
+	readonly onDidChangeTreeData: vscode.Event<NodeEvent> = this.changeTreeDataEmitter.event;
 
 	getTreeItem(element: Node): vscode.TreeItem | Thenable<vscode.TreeItem> {
 		return element.getTreeItem();
@@ -92,7 +89,7 @@ export default class RepositoryProvider implements vscode.TreeDataProvider<Node>
 
 	getChildren(element?: Node): vscode.ProviderResult<Node[]> {
 		if (!element) {
-			const uri = vscode.Uri.joinPath(this.baseUri, 'repos');
+			const uri = vscode.Uri.joinPath(this.getBaseUri(), 'repos');
 			return fetch(uri.toString())
 				.then(response => response.json())
 				.then(inventory => Object.keys(inventory)
