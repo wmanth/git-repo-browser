@@ -1,5 +1,6 @@
 import express from 'express';
 import * as common from '@repofs/common';
+import { normalize } from 'path';
 import { Directory, Submodule } from '../apis/api';
 import Config from '../classes/Config';
 
@@ -33,7 +34,8 @@ repos.get("/:id/refs/*", async (req, res, next) => {
 		const repo = await config.getRepoAPI(req.params.id);
 		const refs = await repo.getRefs();
 		var refPath: string = (req.params as any)[0];
-		refPath = refPath.endsWith('/') ? refPath.slice(0, -1) : refPath;
+		refPath = normalize(refPath);
+		refPath = refPath.replace(/^\/+|\/+$/g, ''); // trim leading and trailing '/'
 
 		if (!refPath) {
 			res.json(refs);
